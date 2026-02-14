@@ -1,0 +1,6 @@
+.DS_Store
+.playwright-mcp/
+archive/
+
+# Playwright screenshots from dev
+episodes-*.png

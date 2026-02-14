@@ -1,0 +1,97 @@
+[
+  {
+    "number": 6,
+    "slug": "biden-border-part-2",
+    "title": "Biden and the Border, Part 2",
+    "date": "February 10, 2026",
+    "duration": "55 min",
+    "description": "In part two of our deep dive into the Biden administration\u2019s border policies, we examine the political fallout and the lasting impact on the immigration debate.",
+    "megaphone_id": "PLMD1579921585",
+    "image": null,
+    "guest": {
+      "name": "Charanya Krishnaswami",
+      "role": "Immigration Policy Expert",
+      "initials": "CK"
+    },
+    "resources": [],
+    "transcript": null
+  },
+  {
+    "number": 5,
+    "slug": "biden-border-part-1",
+    "title": "Biden and the Border, Part 1",
+    "date": "February 3, 2026",
+    "duration": "60 min",
+    "description": "The Biden administration came in promising a more humane approach to the border. What happened next surprised everyone\u2014including Biden\u2019s own team. We break down how good intentions met harsh realities.",
+    "megaphone_id": "PLMD1579921585",
+    "image": null,
+    "guest": {
+      "name": "Charanya Krishnaswami",
+      "role": "Immigration Policy Expert",
+      "initials": "CK"
+    },
+    "resources": [],
+    "transcript": null
+  },
+  {
+    "number": 4,
+    "slug": "birth-of-dhs",
+    "title": "The Birth of the Department of Homeland Security",
+    "date": "January 27, 2026",
+    "duration": "62 min",
+    "description": "After 9/11, the U.S. government undertook the largest federal reorganization since the creation of the Pentagon. The result was DHS\u2009\u2014\u2009a sprawling mega-agency that absorbed immigration functions from three different departments. How did this reshuffling shape the immigration system we have today, and what did we lose in the process?",
+    "megaphone_id": "PLMD1579921585",
+    "image": "never_again.jpg",
+    "guest": {
+      "name": "Michael Chen",
+      "role": "Former DHS Official",
+      "initials": "MC"
+    },
+    "resources": [
+      {"title": "Homeland Security Act of 2002", "url": "#"},
+      {"title": "9/11 Commission Report\u2009\u2014\u2009Immigration Chapter", "url": "#"},
+      {"title": "CRS: The Reorganization of INS", "url": "#"},
+      {"title": "GAO: DHS Management Challenges", "url": "#"}
+    ],
+    "transcript": "<p><span class=\"transcript__speaker\">Claire Trickler-McNulty:</span> Welcome back to the Melting Pod. Today we\u2019re talking about something that fundamentally reshaped how America handles immigration\u2009\u2014\u2009the creation of the Department of Homeland Security.</p>\n<p><span class=\"transcript__speaker\">Doug Rand:</span> Yeah, and I think most people don\u2019t realize that before 2003, there was no DHS. Immigration was handled by the Immigration and Naturalization Service\u2009\u2014\u2009the INS\u2009\u2014\u2009which sat inside the Department of Justice.</p>\n<p><span class=\"transcript__speaker\">Amanda Baran:</span> And the INS was this fascinating, deeply dysfunctional agency that was responsible for both welcoming immigrants and deporting them. It was like having the same person be your defense attorney and the prosecutor.</p>\n<p><span class=\"transcript__speaker\">Claire:</span> Which is exactly why Congress decided to blow it up after 9/11. But the story of how DHS came together is really a story about the politics of fear, bureaucratic turf wars, and some genuinely consequential decisions made under enormous time pressure.</p>\n<p><span class=\"transcript__speaker\">Doug:</span> Let\u2019s bring in our guest. Michael Chen served in senior roles at both the old INS and the new DHS during the transition. Michael, take us back to that moment\u2026</p>\n<p style=\"color: var(--steel); font-style: italic;\">[Transcript continues\u2026]</p>"
+  },
+  {
+    "number": 3,
+    "slug": "rise-fall-comprehensive-reform",
+    "title": "The Rise and Fall of Comprehensive Immigration Reform",
+    "date": "January 20, 2026",
+    "duration": "58 min",
+    "description": "For decades, \u201ccomprehensive immigration reform\u201d was the holy grail of immigration policy. From Reagan\u2019s 1986 amnesty to the Gang of Eight, we trace how the grand bargain kept almost happening\u2009\u2014\u2009and why it keeps falling apart.",
+    "megaphone_id": "PLMD1579921585",
+    "image": "womens_march.jpg",
+    "guest": null,
+    "resources": [],
+    "transcript": null
+  },
+  {
+    "number": 2,
+    "slug": "asylum-border-politics",
+    "title": "How Asylum and the Border Took Over American Politics",
+    "date": "January 13, 2026",
+    "duration": "64 min",
+    "description": "Asylum wasn\u2019t always front-page news. We unpack how a legal protection created after World\u00a0War\u00a0II became the most politically explosive word in immigration\u2009\u2014\u2009and what the current crackdown means for people fleeing danger.",
+    "megaphone_id": "PLMD1579921585",
+    "image": "ice_facility.jpg",
+    "guest": null,
+    "resources": [],
+    "transcript": null
+  },
+  {
+    "number": 1,
+    "slug": "welcome",
+    "title": "Welcome to the Melting Pod",
+    "date": "January 6, 2026",
+    "duration": "38 min",
+    "description": "Meet your hosts: three former federal officials who served four presidents across two decades. We introduce ourselves, explain why we\u2019re doing this, and lay out what you can expect from the show.",
+    "megaphone_id": "PLMD1579921585",
+    "image": "waitingroom.jpg",
+    "guest": null,
+    "resources": [],
+    "transcript": null
+  }
+]
