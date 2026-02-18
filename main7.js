@@ -99,29 +99,33 @@
       const navLogotype = navLogo.querySelector('.nav__logotype');
       const navIcon = navLogo.querySelector('.nav__logo-icon');
 
-      // Inject text SVG inline for letter-by-letter entrance
+      var isFirstVisit = !sessionStorage.getItem('meltPlayed');
+
+      // Inject text SVG inline — letter-by-letter entrance on first visit only
       injectSVG(navLogotype, function (svg) {
         svg.classList.add('nav__logotype', 'svg-injected');
         svg.style.height = '28px';
         svg.style.width = 'auto';
 
-        var letters = svg.querySelectorAll('[id^="_"]');
-        letters.forEach(function (letter, i) {
-          letter.style.transformBox = 'fill-box';
-          letter.style.transformOrigin = 'center center';
-          letter.style.opacity = '0';
-          letter.style.transform = 'translateY(6px)';
-          letter.style.transition = 'opacity 0.45s ease-out, transform 0.45s ease-out';
-          letter.style.transitionDelay = (0.4 + i * 0.045) + 's';
-        });
-        requestAnimationFrame(function () {
+        if (isFirstVisit) {
+          var letters = svg.querySelectorAll('[id^="_"]');
+          letters.forEach(function (letter, i) {
+            letter.style.transformBox = 'fill-box';
+            letter.style.transformOrigin = 'center center';
+            letter.style.opacity = '0';
+            letter.style.transform = 'translateY(6px)';
+            letter.style.transition = 'opacity 0.45s ease-out, transform 0.45s ease-out';
+            letter.style.transitionDelay = (0.4 + i * 0.045) + 's';
+          });
           requestAnimationFrame(function () {
-            letters.forEach(function (letter) {
-              letter.style.opacity = '1';
-              letter.style.transform = 'translateY(0)';
+            requestAnimationFrame(function () {
+              letters.forEach(function (letter) {
+                letter.style.opacity = '1';
+                letter.style.transform = 'translateY(0)';
+              });
             });
           });
-        });
+        }
       });
 
       // Inject icon SVG inline for melt-drop entrance + hover replay
@@ -195,14 +199,13 @@
           mRL1.setAttribute('transform', 'translate(' + (lobeMaxRL1[0]*lobeT*ls) + ',' + (lobeMaxRL1[1]*lobeT*ls) + ')');
         }
 
+        // Play forward: F1 -> F3 (drop + melt)
         function playMelt(onDone) {
           if (meltAnimId) { cancelAnimationFrame(meltAnimId); meltAnimId = null; }
           function tick(startTime, timestamp) {
             var elapsed = timestamp - startTime;
             var rawT = Math.min(elapsed / DURATION, 1);
-            var t = easeOutCubic(rawT);
-            var ct = easeOutQuart(rawT);
-            setMeltFrame(t, ct);
+            setMeltFrame(easeOutCubic(rawT), easeOutQuart(rawT));
             if (rawT < 1) {
               meltAnimId = requestAnimationFrame(function (ts) { tick(startTime, ts); });
             } else {
@@ -213,13 +216,45 @@
           meltAnimId = requestAnimationFrame(function (ts) { tick(ts, ts); });
         }
 
-        // Entrance: only play melt animation once per session
-        var hasPlayed = sessionStorage.getItem('meltPlayed');
+        // Subtle bounce: unsquish 25% then re-melt
+        var BOUNCE_PEAK = 0.25; // how far to reverse (0 = none, 1 = full)
+        var BOUNCE_OUT = 500;   // ms to unsquish
+        var BOUNCE_IN = 1400;   // ms to re-melt (slower, settling feel)
+        function playBounceMelt(onDone) {
+          if (meltAnimId) { cancelAnimationFrame(meltAnimId); meltAnimId = null; }
+          // Phase 1: ease out from t=1 to t=(1-BOUNCE_PEAK)
+          function tickOut(startTime, timestamp) {
+            var elapsed = timestamp - startTime;
+            var rawT = Math.min(elapsed / BOUNCE_OUT, 1);
+            var progress = easeOutCubic(rawT) * BOUNCE_PEAK;
+            setMeltFrame(1 - progress, 1 - progress);
+            if (rawT < 1) {
+              meltAnimId = requestAnimationFrame(function (ts) { tickOut(startTime, ts); });
+            } else {
+              // Phase 2: ease back from t=(1-BOUNCE_PEAK) to t=1
+              meltAnimId = requestAnimationFrame(function (ts) { tickIn(ts, ts); });
+            }
+          }
+          function tickIn(startTime, timestamp) {
+            var elapsed = timestamp - startTime;
+            var rawT = Math.min(elapsed / BOUNCE_IN, 1);
+            var progress = BOUNCE_PEAK * (1 - easeOutCubic(rawT));
+            setMeltFrame(1 - progress, 1 - progress);
+            if (rawT < 1) {
+              meltAnimId = requestAnimationFrame(function (ts) { tickIn(startTime, ts); });
+            } else {
+              meltAnimId = null;
+              if (onDone) onDone();
+            }
+          }
+          meltAnimId = requestAnimationFrame(function (ts) { tickOut(ts, ts); });
+        }
 
-        if (!hasPlayed) {
-          // First visit this session: animate entrance
+        // Entrance behavior
+        if (isFirstVisit) {
+          // First visit: fade in + full drop animation after letters finish
           svg.style.opacity = '0';
-          var entranceDelay = (0.4 + 13 * 0.045 + 0.15) * 1000; // ms
+          var entranceDelay = (0.4 + 13 * 0.045 + 0.15) * 1000;
           setTimeout(function () {
             svg.style.transition = 'opacity 0.3s ease-out';
             svg.style.opacity = '1';
@@ -227,14 +262,17 @@
               sessionStorage.setItem('meltPlayed', '1');
             });
           }, entranceDelay);
+        } else {
+          // Return visit: reverse-then-forward bounce
+          playBounceMelt();
         }
 
-        // Hover: replay melt animation (always available)
+        // Hover: reverse-then-forward bounce
         var isAnimating = false;
         navLogo.addEventListener('mouseenter', function () {
           if (isAnimating) return;
           isAnimating = true;
-          playMelt(function () { isAnimating = false; });
+          playBounceMelt(function () { isAnimating = false; });
         });
       });
     }
