@@ -505,12 +505,14 @@ def build_episodes_page(episodes):
     <div class="container" style="position: relative; z-index: 1;">
       <h1 class="page-header__title">Episodes</h1>
       <p class="page-header__desc">Stories about immigration policy, told by the people who lived it.</p>
+      <p class="page-header__desc"><em>New stories coming soon. Catch up on everything you've missed.</em></p>
       <div class="page-header__subscribe">
         <span class="page-header__subscribe-label">Subscribe:</span>
         <a href="#" class="platform-btn platform-btn--dark">Apple Podcasts</a>
         <a href="#" class="platform-btn platform-btn--dark">Spotify</a>
         <a href="#" class="platform-btn platform-btn--dark">YouTube</a>
         <a href="#" class="platform-btn platform-btn--dark">RSS Feed</a>
+        <a href="#" class="platform-btn platform-btn--dark">Newsletter</a>
       </div>
     </div>
   </header>
@@ -545,10 +547,10 @@ def build_episodes_page(episodes):
 
 def build_episode_detail(ep):
     """Build an individual episode detail page."""
-    # Player
+    # Player (single-episode embed supports ?start= for chapter seeking)
     if ep.get("megaphone_id"):
         player_html = f'''          <div class="episode-detail__player episode-detail__player--megaphone">
-            <iframe frameborder="0" height="200" scrolling="no" src="https://playlist.megaphone.fm?e={ep['megaphone_id']}" width="100%" title="Listen: {ep['title']}" loading="lazy"></iframe>
+            <iframe id="megaphonePlayer" frameborder="0" height="200" scrolling="no" src="https://player.megaphone.fm/{ep['megaphone_id']}" width="100%" title="Listen: {ep['title']}" loading="lazy"></iframe>
           </div>'''
     else:
         player_html = '          <div class="episode-detail__player episode-detail__player--coming-soon"><p style="color: var(--steel); font-style: italic;">Player coming soon</p></div>'
@@ -570,6 +572,39 @@ def build_episode_detail(ep):
           </div>'''
     else:
         transcript_html = ""
+
+    # Summary (longer multi-paragraph description, replaces short description when present)
+    if ep.get("summary"):
+        summary_html = f'''          <div class="episode-detail__summary">
+            {ep['summary']}
+          </div>'''
+    else:
+        summary_html = ""
+
+    # Chapters / Timestamps
+    if ep.get("chapters"):
+        def time_to_seconds(t):
+            """Convert 'M:SS' or 'H:MM:SS' to total seconds."""
+            parts = t.split(":")
+            if len(parts) == 2:
+                return int(parts[0]) * 60 + int(parts[1])
+            return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+
+        chapter_items = "\n".join(
+            f'                <li class="chapters__item">'
+            f'<button class="chapters__time" data-seconds="{time_to_seconds(ch["time"])}">{ch["time"]}</button>'
+            f'<span class="chapters__title">{ch["title"]}</span>'
+            f'</li>'
+            for ch in ep["chapters"]
+        )
+        chapters_html = f'''          <div class="chapters">
+            <h2 class="chapters__heading">In This Episode</h2>
+            <ol class="chapters__list">
+{chapter_items}
+            </ol>
+          </div>'''
+    else:
+        chapters_html = ""
 
     # Guest sidebar card
     guest_html = ""
@@ -645,9 +680,9 @@ def build_episode_detail(ep):
 {player_html}
 
           <!-- Description -->
-          <div class="episode-detail__desc">
-            <p>{ep['description']}</p>
-          </div>
+          {summary_html if summary_html else f'<div class="episode-detail__desc"><p>{ep["description"]}</p></div>'}
+
+{chapters_html}
 {transcript_html}
         </div>
 
@@ -851,8 +886,13 @@ def write_file(path, content):
 def main():
     clean = "--clean" in sys.argv
 
-    episodes = load_episodes()
-    print(f"Loaded {len(episodes)} episodes from data/episodes.json\n")
+    all_episodes = load_episodes()
+    episodes = [ep for ep in all_episodes if ep.get("published", True)]
+    skipped = len(all_episodes) - len(episodes)
+    msg = f"Loaded {len(episodes)} episodes from data/episodes.json"
+    if skipped:
+        msg += f" ({skipped} unpublished)"
+    print(msg + "\n")
 
     if clean:
         # Remove old generated episode detail pages

@@ -157,6 +157,32 @@
     }
   }
 
+  // --- Chapter timestamp seeking (Megaphone player) ---
+  const megaphonePlayer = document.getElementById('megaphonePlayer');
+  if (megaphonePlayer) {
+    function seekTo(seconds) {
+      const baseSrc = megaphonePlayer.src.split('?')[0];
+      megaphonePlayer.src = baseSrc + '?start=' + seconds;
+      megaphonePlayer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Click on timestamp button
+    document.querySelectorAll('.chapters__time[data-seconds]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        seekTo(parseInt(btn.dataset.seconds, 10));
+      });
+    });
+
+    // Click anywhere on the chapter row
+    document.querySelectorAll('.chapters__item').forEach(item => {
+      item.addEventListener('click', () => {
+        const btn = item.querySelector('.chapters__time[data-seconds]');
+        if (btn) seekTo(parseInt(btn.dataset.seconds, 10));
+      });
+    });
+  }
+
   // --- SVG injection utility ---
   function injectSVG(imgEl, callback) {
     if (!imgEl || !imgEl.src) return;

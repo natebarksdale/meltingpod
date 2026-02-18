@@ -1477,7 +1477,7 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
 }
 
 .episode-archive-card--has-img > .episode-archive-card__play {
-  display: flex;
+  display: none;
 }
 
 .episode-archive-card__img-wrap {
@@ -1888,6 +1888,92 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
   color: var(--slate);
   line-height: 1.8;
   margin-bottom: var(--space-2xl);
+}
+
+/* Episode Summary (multi-paragraph) */
+.episode-detail__summary {
+  font-size: 1.05rem;
+  color: var(--slate);
+  line-height: 1.8;
+  margin-bottom: var(--space-2xl);
+}
+
+.episode-detail__summary p {
+  margin-bottom: var(--space-lg);
+}
+
+.episode-detail__summary p:last-child {
+  margin-bottom: 0;
+}
+
+/* Chapters / Timestamps */
+.chapters {
+  margin-bottom: var(--space-2xl);
+  padding: var(--space-xl);
+  background: var(--white);
+  border-radius: 10px;
+  border: 1px solid rgba(10, 22, 40, 0.06);
+}
+
+.chapters__heading {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--steel);
+  margin-bottom: var(--space-lg);
+}
+
+.chapters__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.chapters__item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-xs);
+  border-bottom: 1px solid rgba(10, 22, 40, 0.04);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.chapters__item:last-child {
+  border-bottom: none;
+}
+
+.chapters__time {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--amber);
+  white-space: nowrap;
+  min-width: 3.5rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s ease;
+}
+
+.chapters__time:hover {
+  color: var(--navy);
+  text-decoration: underline;
+}
+
+.chapters__item:hover {
+  background: rgba(10, 22, 40, 0.02);
+}
+
+.chapters__title {
+  font-size: 0.92rem;
+  color: var(--navy);
+  line-height: 1.5;
 }
 
 /* Transcript */
