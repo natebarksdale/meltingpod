@@ -124,34 +124,117 @@
         });
       });
 
-      // Inject icon SVG inline for entrance bounce + hover wobble
+      // Inject icon SVG inline for melt-drop entrance + hover replay
       injectSVG(navIcon, function (svg) {
         svg.classList.add('nav__logo-icon', 'svg-injected');
-        svg.style.height = '40px';
+        svg.style.height = '54px';
         svg.style.width = 'auto';
-        svg.style.marginLeft = '-8px';
+        svg.style.marginLeft = '-12px';
         svg.style.overflow = 'visible';
 
-        // Entrance: pop in with spring bounce after letters finish
-        svg.style.opacity = '0';
-        svg.style.transform = 'scale(0.8)';
-        svg.style.transition = 'opacity 0.5s cubic-bezier(0.23,1,0.32,1), transform 0.6s cubic-bezier(0.34,1.56,0.64,1)';
-        svg.style.transitionDelay = (0.4 + 13 * 0.045 + 0.15) + 's';
-        requestAnimationFrame(function () {
-          requestAnimationFrame(function () {
-            svg.style.opacity = '1';
-            svg.style.transform = 'scale(1)';
-          });
-        });
+        // --- Melt-drop animation engine ---
+        var easeOutCubic = function (t) { return 1 - Math.pow(1 - t, 3); };
+        var easeOutQuart = function (t) { return 1 - Math.pow(1 - t, 4); };
+        function lerpArr(a, b, t) { return a.map(function (v, i) { return v + (b[i] - v) * t; }); }
 
-        // Hover: bouncy zoom on the whole icon
-        svg.style.transformOrigin = 'center center';
+        // Animation config (user's chosen settings from prototype)
+        var DURATION = 3400;
+        var DROP = 200;
+        var ROTATION = -18;
+        var LOBE_SCALE = 1.15;
+
+        // Crown keyframe matrices: F1 (tilted on head) -> F2 (straightened) -> F3 (tilted again)
+        var crownF1 = [1.832551, 0.416626, -0.416626, 1.832551, 95.351392, 1692.706607];
+        var crownF2 = [1.87882, 0.043051, -0.043051, 1.87882, -128.955479, 1852.173149];
+        var crownF3 = [1.832551, 0.416626, -0.416626, 1.832551, 95.351392, 1692.706607];
+
+        // Circle body: F1 (rounder) -> F3 (squished/melted)
+        var circleF1 = [0.528874, -0.005225, 0.0055, 0.556673, 32.810, -48.031];
+        var circleF3 = [0.528874, -0.005225, 0.005279, 0.534319, 32.943, -34.574];
+
+        // Lobe max offsets (F1 spread values; F3 = 0,0)
+        var lobeMaxLL1 = [164.284, -29.657];
+        var lobeMaxLL2 = [125.124, -42.339];
+        var lobeMaxRL1 = [-111.297, -27.438];
+
+        // Element refs inside the injected SVG
+        var mWrapper = svg.getElementById('melt-wrapper');
+        var mCrown = svg.getElementById('melt-crown');
+        var mCircle = svg.getElementById('melt-circle');
+        var mLL1 = svg.getElementById('melt-ll1');
+        var mLL2 = svg.getElementById('melt-ll2');
+        var mRL1 = svg.getElementById('melt-rl1');
+
+        var meltAnimId = null;
+
+        function setMeltFrame(t, ct) {
+          // Wrapper: rotation + vertical drop centered on viewBox (700,700)
+          var rot = ROTATION * (1 - t);
+          var dropY = -DROP * (1 - t);
+          mWrapper.setAttribute('transform',
+            'translate(700,700) rotate(' + rot + ') translate(0,' + dropY + ') translate(-700,-700)');
+
+          // Crown: smooth pass through F2
+          var crownVals;
+          if (ct < 0.5) {
+            crownVals = lerpArr(crownF1, crownF2, ct * 2);
+          } else {
+            crownVals = lerpArr(crownF2, crownF3, (ct - 0.5) * 2);
+          }
+          mCrown.setAttribute('transform', 'matrix(' + crownVals.join(',') + ')');
+
+          // Circle: round -> squished
+          var circleVals = lerpArr(circleF1, circleF3, t);
+          mCircle.setAttribute('transform', 'matrix(' + circleVals.join(',') + ')');
+
+          // Lobes: spread -> tucked
+          var lobeT = 1 - t;
+          var ls = LOBE_SCALE;
+          mLL1.setAttribute('transform', 'translate(' + (lobeMaxLL1[0]*lobeT*ls) + ',' + (lobeMaxLL1[1]*lobeT*ls) + ')');
+          mLL2.setAttribute('transform', 'translate(' + (lobeMaxLL2[0]*lobeT*ls) + ',' + (lobeMaxLL2[1]*lobeT*ls) + ')');
+          mRL1.setAttribute('transform', 'translate(' + (lobeMaxRL1[0]*lobeT*ls) + ',' + (lobeMaxRL1[1]*lobeT*ls) + ')');
+        }
+
+        function playMelt(onDone) {
+          if (meltAnimId) { cancelAnimationFrame(meltAnimId); meltAnimId = null; }
+          function tick(startTime, timestamp) {
+            var elapsed = timestamp - startTime;
+            var rawT = Math.min(elapsed / DURATION, 1);
+            var t = easeOutCubic(rawT);
+            var ct = easeOutQuart(rawT);
+            setMeltFrame(t, ct);
+            if (rawT < 1) {
+              meltAnimId = requestAnimationFrame(function (ts) { tick(startTime, ts); });
+            } else {
+              meltAnimId = null;
+              if (onDone) onDone();
+            }
+          }
+          meltAnimId = requestAnimationFrame(function (ts) { tick(ts, ts); });
+        }
+
+        // Entrance: only play melt animation once per session
+        var hasPlayed = sessionStorage.getItem('meltPlayed');
+
+        if (!hasPlayed) {
+          // First visit this session: animate entrance
+          svg.style.opacity = '0';
+          var entranceDelay = (0.4 + 13 * 0.045 + 0.15) * 1000; // ms
+          setTimeout(function () {
+            svg.style.transition = 'opacity 0.3s ease-out';
+            svg.style.opacity = '1';
+            playMelt(function () {
+              sessionStorage.setItem('meltPlayed', '1');
+            });
+          }, entranceDelay);
+        }
+
+        // Hover: replay melt animation (always available)
+        var isAnimating = false;
         navLogo.addEventListener('mouseenter', function () {
-          if (svg.style.animationName === 'logoWobble') return;
-          svg.style.animation = 'logoWobble 0.5s cubic-bezier(0.34,1.56,0.64,1)';
-          svg.addEventListener('animationend', function () {
-            svg.style.animation = '';
-          }, { once: true });
+          if (isAnimating) return;
+          isAnimating = true;
+          playMelt(function () { isAnimating = false; });
         });
       });
     }

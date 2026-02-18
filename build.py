@@ -81,7 +81,7 @@ def build_nav_html(active_page):
     <div class="nav__inner">
       <a href="index.html" class="nav__logo">
         <img src="TMP_text_horiz_black.svg" alt="The Melting Pod" class="nav__logotype">
-        <img src="TMP_Logo_2-9_animated.svg" alt="" class="nav__logo-icon">
+        <img src="TMP_Logo_animated_melt.svg" alt="" class="nav__logo-icon">
       </a>
       <div class="nav__links" id="navLinks">
 {nav_links}
