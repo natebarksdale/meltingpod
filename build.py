@@ -217,9 +217,13 @@ def build_episode_archive_card(ep):
     guest_html = ""
     if ep.get("guest"):
         g = ep["guest"]
+        if g.get("image"):
+            guest_avatar = f'<img src="{g["image"]}" alt="{g["name"]}" class="episode-archive-card__guest-avatar" style="width:24px;height:24px;border-radius:50%;object-fit:cover;">'
+        else:
+            guest_avatar = f'<div class="episode-archive-card__guest-avatar">{g["initials"]}</div>'
         guest_html = f'''
             <div class="episode-archive-card__guest">
-              <div class="episode-archive-card__guest-avatar">{g['initials']}</div>
+              {guest_avatar}
               <span>with {g['name']}</span>
             </div>'''
 
@@ -256,9 +260,13 @@ def build_featured_episode(ep):
     guest_html = ""
     if ep.get("guest"):
         g = ep["guest"]
+        if g.get("image"):
+            featured_avatar = f'<img src="{g["image"]}" alt="{g["name"]}" class="episode-featured__guest-avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">'
+        else:
+            featured_avatar = f'<div class="episode-featured__guest-avatar">{g["initials"]}</div>'
         guest_html = f'''
           <div class="episode-featured__guest">
-            <div class="episode-featured__guest-avatar">{g['initials']}</div>
+            {featured_avatar}
             <div class="episode-featured__guest-info">
               <span class="episode-featured__guest-label">Featuring </span>
               <span class="episode-featured__guest-name">{g['name']}</span>
@@ -591,18 +599,47 @@ def build_episode_detail(ep):
                 return int(parts[0]) * 60 + int(parts[1])
             return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
 
-        chapter_items = "\n".join(
-            f'                <li class="chapters__item">'
-            f'<button class="chapters__time" data-seconds="{time_to_seconds(ch["time"])}">{ch["time"]}</button>'
-            f'<span class="chapters__title">{ch["title"]}</span>'
-            f'</li>'
-            for ch in ep["chapters"]
-        )
-        chapters_html = f'''          <div class="chapters">
+        def render_chapter(ch):
+            return (
+                f'<li class="chapters__item">'
+                f'<button class="chapters__time" data-seconds="{time_to_seconds(ch["time"])}">{ch["time"]}</button>'
+                f'<span class="chapters__title">{ch["title"]}</span>'
+                f'</li>'
+            )
+
+        preview_count = 2
+        all_chapters = ep["chapters"]
+        total = len(all_chapters)
+
+        if total <= preview_count + 1:
+            # Not worth collapsing for 3 or fewer items
+            chapter_items = "\n".join(f'                {render_chapter(ch)}' for ch in all_chapters)
+            chapters_html = f'''          <div class="chapters">
             <h2 class="chapters__heading">In This Episode</h2>
             <ol class="chapters__list">
 {chapter_items}
             </ol>
+          </div>'''
+        else:
+            preview_items = "\n".join(f'                {render_chapter(ch)}' for ch in all_chapters[:preview_count])
+            overflow_items = "\n".join(f'                  {render_chapter(ch)}' for ch in all_chapters[preview_count:])
+            remaining = total - preview_count
+            chapters_html = f'''          <div class="chapters" id="chaptersSection">
+            <h2 class="chapters__heading">In This Episode</h2>
+            <ol class="chapters__list">
+              <div class="chapters__preview">
+{preview_items}
+              </div>
+              <div class="chapters__overflow">
+                <div class="chapters__overflow-inner">
+{overflow_items}
+                </div>
+              </div>
+            </ol>
+            <button class="chapters__toggle" id="chaptersToggle" aria-expanded="false">
+              <span class="chapters__toggle-text">Show all {total} chapters</span>
+              <svg class="chapters__toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
           </div>'''
     else:
         chapters_html = ""
@@ -611,12 +648,16 @@ def build_episode_detail(ep):
     guest_html = ""
     if ep.get("guest"):
         g = ep["guest"]
+        if g.get("image"):
+            avatar_html = f'<img src="{g["image"]}" alt="{g["name"]}" class="sidebar-host__avatar">'
+        else:
+            avatar_html = f'<div class="sidebar-host__avatar" style="background: var(--slate); color: var(--silver); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600;">{g["initials"]}</div>'
         guest_html = f'''
           <div class="sidebar-card">
             <h3 class="sidebar-card__title">Guest</h3>
             <div class="sidebar-card__hosts">
               <div class="sidebar-host">
-                <div class="sidebar-host__avatar" style="background: var(--slate); color: var(--silver); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600;">{g['initials']}</div>
+                {avatar_html}
                 <div>
                   <div class="sidebar-host__name">{g['name']}</div>
                   <div class="sidebar-host__role">{g['role']}</div>
@@ -625,9 +666,95 @@ def build_episode_detail(ep):
             </div>
           </div>'''
 
-    # Resources sidebar card
-    resources_html = ""
+    # Learn More & Give More sections (main column)
+    resources_main_html = ""
     if ep.get("resources"):
+        learn_items = [r for r in ep["resources"] if r.get("category") == "learn"]
+        give_items = [r for r in ep["resources"] if r.get("category") == "give"]
+        # Fallback: if no categories, treat all as learn
+        if not learn_items and not give_items:
+            learn_items = ep["resources"]
+
+        sections = []
+
+        # Learn More section
+        if learn_items:
+            arrow_svg_learn = '<svg class="learn-more__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>'
+            learn_cards = []
+            for r in learn_items:
+                meta_parts = []
+                if r.get("source"):
+                    meta_parts.append(f'<span class="learn-more__source">{r["source"]}</span>')
+                if r.get("date"):
+                    meta_parts.append(f'<span class="learn-more__date">{r["date"]}</span>')
+                meta_html = "\n                    ".join(meta_parts)
+                desc_html = f'\n                  <p class="learn-more__desc">{r["description"]}</p>' if r.get("description") else ""
+                learn_cards.append(f'''              <a href="{r['url']}" class="learn-more__item" target="_blank" rel="noopener">
+                <div class="learn-more__body">
+                  <h4 class="learn-more__title">{r['title']}</h4>
+                  <div class="learn-more__meta">
+                    {meta_html}
+                  </div>{desc_html}
+                </div>
+                {arrow_svg_learn}
+              </a>''')
+            learn_html = "\n".join(learn_cards)
+            sections.append(f'''          <div class="episode-resources__section">
+            <h3 class="episode-resources__heading">Learn More</h3>
+            <div class="learn-more__list">
+{learn_html}
+            </div>
+          </div>''')
+
+        # Give More section
+        if give_items:
+            national = [r for r in give_items if r.get("scope") == "national"]
+            local = [r for r in give_items if r.get("scope") == "local"]
+            # Items without scope go into national
+            unscoped = [r for r in give_items if not r.get("scope")]
+            national = national + unscoped
+
+            arrow_svg_give = '<svg class="give-more__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>'
+            groups = []
+            for label, items in [("National", national), ("Local", local)]:
+                if not items:
+                    continue
+                org_cards = []
+                for r in items:
+                    desc_html = f'\n                    <p class="give-more__desc">{r["description"]}</p>' if r.get("description") else ""
+                    org_cards.append(f'''                <a href="{r['url']}" class="give-more__item" target="_blank" rel="noopener">
+                  <div class="give-more__body">
+                    <div class="give-more__name">{r['title']}</div>{desc_html}
+                  </div>
+                  {arrow_svg_give}
+                </a>''')
+                orgs_html = "\n".join(org_cards)
+                groups.append(f'''            <div class="give-more__group">
+              <h4 class="give-more__group-label">{label}</h4>
+              <div class="give-more__list">
+{orgs_html}
+              </div>
+            </div>''')
+
+            groups_html = "\n".join(groups)
+            sections.append(f'''          <div class="episode-resources__section">
+            <h3 class="episode-resources__heading">Give More</h3>
+            <p class="episode-resources__intro">Want to help build a more sane and humane immigration system? Support hardworking organizations like these:</p>
+            <div class="give-more__groups">
+{groups_html}
+            </div>
+          </div>''')
+
+        if sections:
+            sections_html = "\n\n".join(sections)
+            resources_main_html = f'''
+          <div class="episode-resources">
+{sections_html}
+          </div>'''
+
+    # Legacy sidebar resources (for episodes without categorized resources)
+    resources_html = ""
+    if ep.get("resources") and not resources_main_html:
         links = "\n".join(f'              <a href="{r["url"]}">{r["title"]} &rarr;</a>' for r in ep["resources"])
         resources_html = f'''
           <div class="sidebar-card">
@@ -684,6 +811,7 @@ def build_episode_detail(ep):
           {summary_html if summary_html else f'<div class="episode-detail__desc"><p>{ep["description"]}</p></div>'}
 
 {chapters_html}
+{resources_main_html}
 {transcript_html}
         </div>
 

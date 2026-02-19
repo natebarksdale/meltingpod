@@ -1,40 +1,106 @@
 [
   {
-    "number": 6,
+    "number": 3,
     "slug": "biden-border-part-2",
     "title": "Biden and the Border, Part 2",
     "date": "February 10, 2026",
-    "duration": "55 min",
-    "description": "In part two of our deep dive into the Biden administration\u2019s border policies, we examine the political fallout and the lasting impact on the immigration debate.",
-    "megaphone_id": "PLMD1579921585",
+    "duration": "69 min",
+    "description": "In the second half of our deep dive into the Biden administration\u2019s border policy, we pick up in 2023 at the end of Title 42. We move past the punditry to examine the CBP One app, the political theater of migrant busing, and outline a five-point plan for building a system based on reality rather than fear.",
+    "megaphone_id": "PLMD8627946331",
     "image": "never_again.jpg",
+    "summary": "<p>In the second half of our deep dive into the Biden administration\u2019s border policy, we pick up in 2023 at the end of Title 42. Former DHS counselor Charanya Krishnaswami joins Claire Trickler-McNulty, Amanda Baran, and Doug Rand to dismantle the simplistic narratives that dominate the news cycle. We move past the punditry to examine the \u201ccarrot and stick\u201d approach of the CBP One app, the political theater of migrant busing, and the internal friction over \u201cpull factors.\u201d</p>\n<p>Krishnaswami offers a candid look at the administration\u2019s struggle to balance a humanitarian vision against an obsession with border numbers. We discuss why the much-hyped 2024 bipartisan border bill was viewed by many insiders as a messaging exercise that traded away asylum protections for nothing in return. Finally, we move toward a constructive path forward, outlining a tactical five-point plan for any future administration looking to build a system based on regional diplomacy, clear legal standards, and operational reality rather than fear.</p>\n<p>This isn\u2019t a story of heroes and villains\u2014it\u2019s an unvarnished look at why acting in good faith is often insufficient within a rigid, outdated bureaucracy.</p>",
+    "chapters": [
+      {"time": "0:00", "title": "Welcome and guest introduction"},
+      {"time": "1:58", "title": "Charanya\u2019s background from litigator to DHS counselor"},
+      {"time": "2:22", "title": "Deconstructing the \u201cwoke Latino\u201d and \u201cpolicy demander\u201d myths"},
+      {"time": "4:22", "title": "The \u201cborder first\u201d metric and its impact on broader policy"},
+      {"time": "8:44", "title": "Transitioning from Title 42 to the \u201ccircumvention of lawful pathways\u201d"},
+      {"time": "12:20", "title": "The history of ports of entry and the \u201cmetering\u201d of asylum"},
+      {"time": "15:37", "title": "The CBP One app: Innovation vs. \u201casylum by lottery\u201d"},
+      {"time": "18:18", "title": "Enforcement perspectives and the fear of \u201cpull factors\u201d"},
+      {"time": "21:58", "title": "Greg Abbott and the weaponization of migrant busing"},
+      {"time": "25:35", "title": "Why border numbers reached a high watermark in late 2023"},
+      {"time": "28:20", "title": "The 2024 border bill: Real negotiation or political messaging?"},
+      {"time": "35:41", "title": "The June 2024 asylum proclamation and the \u201cshout test\u201d"},
+      {"time": "43:10", "title": "Why the Biden administration hewed to Trump\u2019s framing of success"},
+      {"time": "48:15", "title": "A five-point plan for the 2029 administration"},
+      {"time": "56:45", "title": "Defining \u201cpersecution\u201d and the \u201cparticular social group\u201d"},
+      {"time": "63:35", "title": "Closing thoughts on the reverse Midas touch and the need for vision"}
+    ],
     "guest": {
       "name": "Charanya Krishnaswami",
-      "role": "Immigration Policy Expert",
-      "initials": "CK"
+      "role": "Former DHS Senior Advisor",
+      "initials": "CK",
+      "image": "krishnaswami.jpeg"
     },
-    "resources": [],
+    "resources": [
+      {"title": "Circumventing Lawful Pathways final rule", "source": "Federal Register", "description": "Extra credit for the first listener who turns this into a TikTok dance\u2026", "date": "May 16, 2023", "url": "https://www.federalregister.gov/documents/2023/05/16/2023-10146/circumvention-of-lawful-pathways", "category": "learn"},
+      {"title": "Refugee Roulette: Disparities in Asylum Adjudication", "source": "Stanford Law Review", "date": "2007", "url": "https://scholarship.law.georgetown.edu/facpub/1902/", "category": "learn"},
+      {"title": "Homeland Security Shares Unhinged AI Photo in Post on Immigration", "source": "The New Republic", "date": "10.02.2026", "url": "https://newrepublic.com/post/201273/homeland-security-ai-photo-immigration-white-nationalism", "category": "learn"},
+      {"title": "#AfghanEvac", "description": "Working to ensure the U.S. keeps its promise to our Afghan allies", "url": "https://afghanevac.org/", "category": "give", "scope": "national"},
+      {"title": "Asylum Seeker Advocacy Project", "description": "The country\u2019s largest membership organization of asylum seekers, working together for change", "url": "https://asaptogether.org/", "category": "give", "scope": "national"},
+      {"title": "Black Alliance for Just Immigration (BAJI)", "description": "Organizing and advocating for racial, social and economic justice", "url": "https://baji.org/", "category": "give", "scope": "national"},
+      {"title": "Haitian Bridge Alliance", "description": "Providing humanitarian, legal, and social services", "url": "https://haitianbridgealliance.org/", "category": "give", "scope": "national"},
+      {"title": "International Refugee Assistance Project (IRAP)", "description": "Strategic litigation and advocacy to uphold the rights of people seeking safety", "url": "https://refugeerights.org/", "category": "give", "scope": "national"},
+      {"title": "Justice Action Center", "description": "Immigrant justice through litigation and storytelling", "url": "https://justiceactioncenter.org/", "category": "give", "scope": "national"},
+      {"title": "Al Otro Lado", "description": "Legal and humanitarian support to refugees, deportees, and other migrants in the U.S. and Tijuana", "url": "https://www.alotrolado.org/", "category": "give", "scope": "local"},
+      {"title": "Catholic Charities Rio Grande Valley", "description": "Providing assistance to the poor and most vulnerable populations in the Rio Grande Valley community", "url": "https://catholiccharitiesrgv.org/", "category": "give", "scope": "local"},
+      {"title": "Las Americas Immigrant Advocacy Center", "description": "Free and low-cost legal services to immigrants and refugees in West Texas, New Mexico, and Ciudad Juarez, Mexico", "url": "https://www.las-americas.org/", "category": "give", "scope": "local"},
+      {"title": "Support an immigration service provider near you", "url": "https://www.immigrationadvocates.org/nonprofit/legaldirectory/", "category": "give", "scope": "local"}
+    ],
     "transcript": null
   },
   {
-    "number": 5,
+    "number": 2,
     "slug": "biden-border-part-1",
     "title": "Biden and the Border, Part 1",
     "date": "February 3, 2026",
-    "duration": "60 min",
+    "duration": "74 min",
     "description": "The Biden administration came in promising a more humane approach to the border. What happened next surprised everyone\u2014including Biden\u2019s own team. We break down how good intentions met harsh realities.",
-    "megaphone_id": "PLMD1579921585",
+    "megaphone_id": "PLMD7501861936",
     "image": null,
+    "summary": "<p>In this episode of The Melting Pod, co-hosts Doug Rand, Claire Trickler-McNulty, and Amanda Baran begin a two-part deep dive into the reality of the border during the Biden administration. They are joined by Charanya Krishnaswami, who served as a senior advisor to the Secretary of Homeland Security for all four years of the administration. Together, they pull back the curtain on why seemingly competent people struggled to \u201cfix\u201d an immigration system that became a humanitarian, operational, and political crisis.</p>\n<p>The conversation moves past simplistic political narratives to explore the \u201cmorass\u201d of policies inherited in 2021. The team discusses the decision to maintain Title 42, the \u201cdark magic trick\u201d of using public health law to bypass asylum processes, and how that choice led to inflated border numbers and a perception of chaos.</p>\n<p>From the internal reaction to the imagery of the Del Rio crisis to the \u201ctortured\u201d implementation of the Asylum Officer Rule, this episode provides a candid post-mortem of the administration\u2019s first two years. It is an essential look at the friction between high-level policy goals and the reality of moving a massive federal battleship.</p>",
+    "chapters": [
+      {"time": "0:00", "title": "Introduction to the hosts and their roles in the federal government"},
+      {"time": "2:25", "title": "Guest Charanya Krishnaswami on her role at the Department of Homeland Security"},
+      {"time": "9:10", "title": "The \u201cZoom room\u201d transition: Walking into the executive branch during the height of COVID"},
+      {"time": "13:50", "title": "Debunking the \u201clight switch\u201d myth: Why Trump\u2019s policies stayed in place during the early days"},
+      {"time": "17:30", "title": "Breaking down Title 42: How public health law became a tool for border expulsion"},
+      {"time": "21:30", "title": "The right to asylum: Why the U.S. has these laws and the history of the St. Louis"},
+      {"time": "28:40", "title": "The \u201cunintended\u201d consequences: How Title 42 artificially increased border encounter numbers"},
+      {"time": "33:00", "title": "The Del Rio crisis: Internal reactions and the \u201cbetrayal\u201d felt by law enforcement"},
+      {"time": "41:00", "title": "The Asylum Officer Rule: A failed gambit to speed up the system"},
+      {"time": "53:30", "title": "The \u201cvibe shift\u201d: Moving from humanitarian vision to a focus on making numbers go down"},
+      {"time": "57:00", "title": "Preparing for the end of Title 42 and the \u201cstop-start\u201d effect of litigation"},
+      {"time": "1:03:00", "title": "New restrictions and the \u201cskim milk\u201d protection of withholding of removal"},
+      {"time": "1:07:00", "title": "Ukrainians at the border and the creation of Uniting for Ukraine"},
+      {"time": "1:11:00", "title": "Racial disparities: Comparing the treatment of different migrant populations"}
+    ],
     "guest": {
       "name": "Charanya Krishnaswami",
-      "role": "Immigration Policy Expert",
-      "initials": "CK"
+      "role": "Former DHS Senior Advisor",
+      "initials": "CK",
+      "image": "krishnaswami.jpeg"
     },
-    "resources": [],
+    "resources": [
+      {"title": "How the Other Side Leaves", "source": "This American Life", "description": "Visits a refugee camp in Tijuana, Mexico filled with Ukrainians fleeing the war", "date": "05.06.2022", "url": "https://www.thisamericanlife.org/770/my-lying-eyes/act-two-11", "category": "learn"},
+      {"title": "Coins depicting Border Patrol agent grabbing Haitian migrant trigger investigation", "source": "Los Angeles Times", "date": "06.16.2022", "url": "https://archive.is/cl9YX", "category": "learn"},
+      {"title": "The Voyage of the St. Louis", "source": "Museum of Jewish Heritage", "date": "May 5, 2022", "url": "https://mjhnyc.org/blog/the-voyage-of-the-st-louis/", "category": "learn"},
+      {"title": "#AfghanEvac", "description": "Working to ensure the U.S. keeps its promise to our Afghan allies", "url": "https://afghanevac.org/", "category": "give", "scope": "national"},
+      {"title": "Asylum Seeker Advocacy Project", "description": "The country\u2019s largest membership organization of asylum seekers, working together for change", "url": "https://asaptogether.org/", "category": "give", "scope": "national"},
+      {"title": "Black Alliance for Just Immigration (BAJI)", "description": "Organizing and advocating for racial, social and economic justice", "url": "https://baji.org/", "category": "give", "scope": "national"},
+      {"title": "Haitian Bridge Alliance", "description": "Providing humanitarian, legal, and social services", "url": "https://haitianbridgealliance.org/", "category": "give", "scope": "national"},
+      {"title": "International Refugee Assistance Project (IRAP)", "description": "Strategic litigation and advocacy to uphold the rights of people seeking safety", "url": "https://refugeerights.org/", "category": "give", "scope": "national"},
+      {"title": "Justice Action Center", "description": "Immigrant justice through litigation and storytelling", "url": "https://justiceactioncenter.org/", "category": "give", "scope": "national"},
+      {"title": "Al Otro Lado", "description": "Legal and humanitarian support to refugees, deportees, and other migrants in the U.S. and Tijuana", "url": "https://www.alotrolado.org/", "category": "give", "scope": "local"},
+      {"title": "Catholic Charities Rio Grande Valley", "description": "Providing assistance to the poor and most vulnerable populations in the Rio Grande Valley community", "url": "https://catholiccharitiesrgv.org/", "category": "give", "scope": "local"},
+      {"title": "Las Americas Immigrant Advocacy Center", "description": "Free and low-cost legal services to immigrants and refugees in West Texas, New Mexico, and Ciudad Juarez, Mexico", "url": "https://www.las-americas.org/", "category": "give", "scope": "local"},
+      {"title": "Support an immigration service provider near you", "url": "https://www.immigrationadvocates.org/nonprofit/legaldirectory/", "category": "give", "scope": "local"}
+    ],
     "transcript": null
   },
   {
-    "number": 4,
+    "number": 6,
     "slug": "birth-of-dhs",
     "title": "The Birth of the Department of Homeland Security",
     "date": "January 27, 2026",
@@ -57,7 +123,7 @@
     "published": false
   },
   {
-    "number": 3,
+    "number": 5,
     "slug": "rise-fall-comprehensive-reform",
     "title": "The Rise and Fall of Comprehensive Immigration Reform",
     "date": "January 20, 2026",
@@ -71,7 +137,7 @@
     "published": false
   },
   {
-    "number": 2,
+    "number": 4,
     "slug": "asylum-border-politics",
     "title": "How Asylum and the Border Took Over American Politics",
     "date": "January 13, 2026",
@@ -89,7 +155,7 @@
     "slug": "welcome",
     "title": "Welcome to the Melting Pod",
     "date": "January 6, 2026",
-    "duration": "52 min",
+    "duration": "51 min",
     "description": "Meet your hosts: three former federal officials who served four presidents across two decades. We introduce ourselves, explain why we\u2019re doing this, and lay out what you can expect from the show.",
     "summary": "<p>Welcome to the inaugural episode of the Melting Pod, a deep dive into the messy, misunderstood, and often dysfunctional world of U.S. immigration. Hosted by three veterans who have spent two decades serving across four presidential administrations, this show cuts through the toxic rhetoric and \u201chot take machines\u201d to provide a grounded, expert perspective on where the system stands and where it\u2019s headed.</p>\n<p>In this series premiere, co-hosts Doug Rand, Claire Trickler-McNulty, and Amanda Baran introduce themselves through their unique\u2014and sometimes harrowing\u2014professional journeys. Claire shares her experience being targeted by congressional investigations and political attacks while working on detention reform at ICE. Amanda discusses her transition from a blues-singing law student to an asylum officer listening to the most difficult stories of human survival. Doug, an evolutionary biologist turned tech entrepreneur and White House policy advisor, explains why he\u2019s obsessed with fixing the pathways for scientists and entrepreneurs.</p>\n<p>The team doesn\u2019t shy away from the grim reality of 2026. They analyze the \u201cspectacular migration crackdown\u201d currently unfolding, the massive supercharging of ICE with a $170 billion budget, and the strategic \u201cde-legalization\u201d of over a million people who previously held protections like TPS. From the mobilization of the National Guard to a mysterious \u201cindefinite pause\u201d on immigration from 75 countries, the hosts reverse-engineer the administration\u2019s tactics to reveal the underlying goals of the current restrictions.</p>\n<p>Despite the \u201cabsolute darkness\u201d of the moment, the episode concludes with a necessary search for hope. Whether it\u2019s through the persistence of public interest litigators, the resilience of neighbors standing up for neighbors, or the belief that the American instinct for welcome cannot be extinguished, the Melting Pod is here to document the struggle for a more sane and humane system.</p>",
     "chapters": [
@@ -110,7 +176,22 @@
     "megaphone_id": "PLMD1579921585",
     "image": "waitingroom.jpg",
     "guest": null,
-    "resources": [],
+    "resources": [
+      {"title": "Sweeping Raids, Giant Camps and Mass Deportations: Inside Trump\u2019s 2025 Immigration Plans", "source": "New York Times", "date": "Nov. 11, 2023", "url": "https://www.nytimes.com/2023/11/11/us/politics/trump-2025-immigration-agenda.html", "category": "learn"},
+      {"title": "ICE Has Diverted Over 25,000 Officers from Their Jobs", "source": "Cato Institute", "date": "Sept. 3, 2025", "url": "https://www.cato.org/blog/ice-has-diverted-over-25000-officers-their-jobs", "category": "learn"},
+      {"title": "Medical examiner likely to classify death of ICE detainee as homicide, recorded call says", "source": "Washington Post", "date": "Jan. 15, 2026", "url": "https://www.washingtonpost.com/immigration/2026/01/15/ice-detention-death-homicide/", "category": "learn"},
+      {"title": "Trump administration sued over visa freeze on immigrants from 75 countries", "source": "NPR", "date": "Feb. 2, 2026", "url": "https://www.npr.org/2026/02/02/nx-s1-5696686/visa-freeze-lawsuit-trump", "category": "learn"},
+      {"title": "#AfghanEvac", "description": "Working to ensure the U.S. keeps its promise to our Afghan allies", "url": "https://afghanevac.org/", "category": "give", "scope": "national"},
+      {"title": "Asylum Seeker Advocacy Project", "description": "The country\u2019s largest membership organization of asylum seekers, working together for change", "url": "https://asaptogether.org/", "category": "give", "scope": "national"},
+      {"title": "Black Alliance for Just Immigration (BAJI)", "description": "Organizing and advocating for racial, social and economic justice", "url": "https://baji.org/", "category": "give", "scope": "national"},
+      {"title": "Haitian Bridge Alliance", "description": "Providing humanitarian, legal, and social services", "url": "https://haitianbridgealliance.org/", "category": "give", "scope": "national"},
+      {"title": "International Refugee Assistance Project (IRAP)", "description": "Strategic litigation and advocacy to uphold the rights of people seeking safety", "url": "https://refugeerights.org/", "category": "give", "scope": "national"},
+      {"title": "Justice Action Center", "description": "Immigrant justice through litigation and storytelling", "url": "https://justiceactioncenter.org/", "category": "give", "scope": "national"},
+      {"title": "Al Otro Lado", "description": "Legal and humanitarian support to refugees, deportees, and other migrants in the U.S. and Tijuana", "url": "https://www.alotrolado.org/", "category": "give", "scope": "local"},
+      {"title": "Catholic Charities Rio Grande Valley", "description": "Providing assistance to the poor and most vulnerable populations in the Rio Grande Valley community", "url": "https://catholiccharitiesrgv.org/", "category": "give", "scope": "local"},
+      {"title": "Las Americas Immigrant Advocacy Center", "description": "Free and low-cost legal services to immigrants and refugees in West Texas, New Mexico, and Ciudad Juarez, Mexico", "url": "https://www.las-americas.org/", "category": "give", "scope": "local"},
+      {"title": "Support an immigration service provider near you", "url": "https://www.immigrationadvocates.org/nonprofit/legaldirectory/", "category": "give", "scope": "local"}
+    ],
     "transcript": null
   }
 ]

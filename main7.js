@@ -304,6 +304,23 @@
     });
   }
 
+  // --- Chapters expand/collapse ---
+  var chaptersToggle = document.getElementById('chaptersToggle');
+  var chaptersSection = document.getElementById('chaptersSection');
+  if (chaptersToggle && chaptersSection) {
+    chaptersToggle.addEventListener('click', function () {
+      var expanded = chaptersSection.classList.toggle('chapters--expanded');
+      chaptersToggle.setAttribute('aria-expanded', expanded);
+      var textEl = chaptersToggle.querySelector('.chapters__toggle-text');
+      if (textEl) {
+        textEl.textContent = expanded ? 'Show less' : textEl.dataset.collapsed;
+      }
+    });
+    // Store the collapsed label
+    var textEl = chaptersToggle.querySelector('.chapters__toggle-text');
+    if (textEl) textEl.dataset.collapsed = textEl.textContent;
+  }
+
   // --- SVG injection utility ---
   function injectSVG(imgEl, callback) {
     if (!imgEl || !imgEl.src) return;
