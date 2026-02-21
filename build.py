@@ -11,6 +11,7 @@ Usage:
 """
 
 import json
+import hashlib
 import os
 import sys
 import re
@@ -26,6 +27,17 @@ SITE_URL = "https://meltingpod.org"
 # that calls the Beehiiv API. See netlify/functions/subscribe.js.
 # Env vars BEEHIIV_API_KEY and BEEHIIV_PUBLICATION_ID are set in the Netlify dashboard.
 TEMPLATES_DIR = ROOT / "templates"
+
+
+def _file_hash(filename, length=8):
+    """Return a short content hash for cache-busting static assets."""
+    path = ROOT / filename
+    digest = hashlib.md5(path.read_bytes()).hexdigest()[:length]
+    return f"{filename}?v={digest}"
+
+
+CSS_REF = _file_hash("styles7.css")
+JS_REF = _file_hash("main7.js")
 
 
 # --- SEO helpers ---
@@ -149,7 +161,7 @@ def build_head(title, description, *, page_url="", og_image="", og_type="website
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles7.css">{jsonld_html}
+  <link rel="stylesheet" href="{CSS_REF}">{jsonld_html}
 </head>'''
 
 def build_nav_html(active_page):
@@ -564,7 +576,7 @@ def build_index(episodes):
 
 {footer}
 
-  <script src="main7.js"></script>
+  <script src="{JS_REF}"></script>
 </body>
 </html>'''
 
@@ -638,7 +650,7 @@ def build_episodes_page(episodes):
 
 {footer}
 
-  <script src="main7.js"></script>
+  <script src="{JS_REF}"></script>
 </body>
 </html>'''
 
@@ -1061,7 +1073,7 @@ def build_episode_detail(ep, prev_ep=None, next_ep=None):
 
 {footer}
 
-  <script src="main7.js"></script>
+  <script src="{JS_REF}"></script>
 </body>
 </html>'''
 
@@ -1161,7 +1173,7 @@ def build_about_page():
 
 {footer}
 
-  <script src="main7.js"></script>
+  <script src="{JS_REF}"></script>
 </body>
 </html>'''
 
@@ -1226,7 +1238,7 @@ def build_contact_page():
 
 {footer}
 
-  <script src="main7.js"></script>
+  <script src="{JS_REF}"></script>
 </body>
 </html>'''
 
