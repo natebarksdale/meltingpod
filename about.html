@@ -8,6 +8,15 @@
   <meta property="og:title" content="About &mdash; The Melting Pod">
   <meta property="og:description" content="Meet the hosts of The Melting Pod: three former federal officials who served four presidents across two decades.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://meltingpod.org/about.html">
+  <meta property="og:image" content="https://meltingpod.org/womens_march.jpg">
+  <meta property="og:site_name" content="The Melting Pod">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="About &mdash; The Melting Pod">
+  <meta name="twitter:description" content="Meet the hosts of The Melting Pod: three former federal officials who served four presidents across two decades.">
+  <meta name="twitter:image" content="https://meltingpod.org/womens_march.jpg">
+  <link rel="canonical" href="https://meltingpod.org/about.html">
+  <link rel="alternate" type="application/rss+xml" title="The Melting Pod" href="https://meltingpod.org/feed.xml">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48 64x64 128x128 256x256" href="favicon.ico">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -15,6 +24,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles7.css">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "PodcastSeries", "name": "The Melting Pod", "description": "Stories about our dysfunctional immigration system and where we go from here.", "url": "https://meltingpod.org/", "image": "https://meltingpod.org/The_Melting_Pod_Podcast_Logo_3000.png", "author": [{"@type": "Person", "name": "Claire Trickler-McNulty"}, {"@type": "Person", "name": "Amanda Baran"}, {"@type": "Person", "name": "Doug Rand"}], "webFeed": "https://meltingpod.org/feed.xml"}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "The Melting Pod", "url": "https://meltingpod.org/", "logo": "https://meltingpod.org/The_Melting_Pod_Podcast_Logo_3000.png", "sameAs": ["https://www.youtube.com/@themeltingpod", "https://bsky.app/profile/meltingpod.bsky.social", "https://www.instagram.com/meltingpodshow"], "contactPoint": {"@type": "ContactPoint", "email": "hello@meltingpod.org", "contactType": "customer support"}}</script>
 </head>
 <body>
   <a href="#main" class="skip-link">Skip to content</a>
@@ -58,7 +69,7 @@
 
   <!-- Page Header -->
   <header class="page-header page-header--has-img">
-    <img src="womens_march.jpg" alt="" class="page-header__img">
+    <img src="womens_march.jpg" alt="Two women wearing American flag headscarves sharing a moment of solidarity at a march" class="page-header__img">
     <div class="page-header__overlay"></div>
     <div class="container" style="position: relative; z-index: 1;">
       <h1 class="page-header__title">About the Show</h1>
@@ -82,7 +93,7 @@
       <div class="hosts-grid">
 
         <div class="host-card scroll-reveal">
-          <div class="host-card__photo host-card__photo--1"><img src="claire.jpeg" alt="Claire Trickler-McNulty"></div>
+          <div class="host-card__photo host-card__photo--1"><img src="claire.jpg" alt="Claire Trickler-McNulty"></div>
           <div class="host-card__body">
             <h2 class="host-card__name">Claire Trickler-McNulty</h2>
             <p class="host-card__bio">Claire knows immigration enforcement and border issues inside and out. Literally&thinsp;&mdash;&thinsp;she&rsquo;s held senior roles at ICE and at a leading nonprofit defending kids against ICE. Her career has spanned the full arc of immigration enforcement policy, giving her a rare perspective that bridges government and advocacy.</p>
@@ -134,26 +145,28 @@
             <h4 class="footer__col-title">Listen</h4>
             <a href="#">Apple Podcasts</a>
             <a href="#">Spotify</a>
-            <a href="#">YouTube</a>
-            <a href="#">RSS Feed</a>
+            <a href="https://www.youtube.com/@themeltingpod">YouTube</a>
+            <a href="feed.xml">RSS Feed</a>
           </div>
           <div class="footer__col">
             <h4 class="footer__col-title">Connect</h4>
-            <a href="#">Twitter/X</a>
-            <a href="#">Bluesky</a>
+            <a href="https://bsky.app/profile/meltingpod.bsky.social">Bluesky</a>
+            <a href="https://www.instagram.com/meltingpodshow">Instagram</a>
             <a href="contact.html">Tips &amp; Press</a>
           </div>
         </div>
       </div>
-      <div class="footer__newsletter">
+      <div class="footer__newsletter" id="newsletter">
         <div class="footer__newsletter-text">
           <h4 class="footer__newsletter-title">Stay in the loop</h4>
           <p class="footer__newsletter-desc">Get updates on new episodes and immigration news.</p>
         </div>
-        <form class="footer__newsletter-form" action="#" method="post">
-          <input type="email" class="footer__newsletter-input" placeholder="Your email address" required>
+        <form class="footer__newsletter-form" action="https://meltingpod.beehiiv.com/subscribe" method="get" target="beehiiv-frame">
+          <input type="email" name="email" class="footer__newsletter-input" placeholder="Your email address" required>
           <button type="submit" class="btn btn--accent footer__newsletter-btn">Subscribe</button>
         </form>
+        <iframe name="beehiiv-frame" style="display:none" aria-hidden="true" tabindex="-1"></iframe>
+        <div class="footer__newsletter-success" aria-live="polite"></div>
       </div>
       <div class="footer__bottom">
         <span>&copy; 2026 The Melting Pod. All rights reserved.</span>

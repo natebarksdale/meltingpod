@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>The Melting Pod</title>
+    <link>https://meltingpod.org/</link>
+    <description>Stories about our dysfunctional immigration system and where we go from here.</description>
+    <language>en-us</language>
+    <atom:link href="https://meltingpod.org/feed.xml" rel="self" type="application/rss+xml"/>
+    <image>
+      <url>https://meltingpod.org/The_Melting_Pod_Podcast_Logo_1400.png</url>
+      <title>The Melting Pod</title>
+      <link>https://meltingpod.org/</link>
+    </image>
+    <item>
+      <title>Biden and the Border, Part 2</title>
+      <link>https://meltingpod.org/episode-biden-border-part-2.html</link>
+      <guid isPermaLink="true">https://meltingpod.org/episode-biden-border-part-2.html</guid>
+      <pubDate>Tue, 10 Feb 2026 00:00:00 +0000</pubDate>
+      <description>In the second half of our deep dive into the Biden administration’s border policy, we pick up in 2023 at the end of Title 42. We move past the punditry to examine the CBP One app, the political theater of migrant busing, and outline a five-point plan for building a system based on reality rather than fear.</description>
+    </item>
+    <item>
+      <title>Biden and the Border, Part 1</title>
+      <link>https://meltingpod.org/episode-biden-border-part-1.html</link>
+      <guid isPermaLink="true">https://meltingpod.org/episode-biden-border-part-1.html</guid>
+      <pubDate>Tue, 03 Feb 2026 00:00:00 +0000</pubDate>
+      <description>The Biden administration came in promising a more humane approach to the border. What happened next surprised everyone—including Biden’s own team. We break down how good intentions met harsh realities.</description>
+    </item>
+    <item>
+      <title>Welcome to The Melting Pod</title>
+      <link>https://meltingpod.org/episode-welcome.html</link>
+      <guid isPermaLink="true">https://meltingpod.org/episode-welcome.html</guid>
+      <pubDate>Tue, 06 Jan 2026 00:00:00 +0000</pubDate>
+      <description>Meet your hosts: three former federal officials who served four presidents across two decades. We introduce ourselves, explain why we’re doing this, and lay out what you can expect from the show.</description>
+    </item>
+  </channel>
+</rss>

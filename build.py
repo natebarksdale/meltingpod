@@ -15,10 +15,70 @@ import os
 import sys
 import re
 from pathlib import Path
+from datetime import datetime
 
 ROOT = Path(__file__).parent
 DATA_DIR = ROOT / "data"
+
+SITE_URL = "https://meltingpod.org"
+
+# --- Beehiiv newsletter integration ---
+# 1. Create a free account at beehiiv.com
+# 2. Set your publication ID below (Settings > Integrations > API)
+# 3. Set your subscribe page URL (e.g. "https://meltingpod.beehiiv.com/subscribe")
+BEEHIIV_PUBLICATION_ID = "YOUR_PUBLICATION_ID"
+BEEHIIV_SUBSCRIBE_URL = "https://meltingpod.beehiiv.com/subscribe"
 TEMPLATES_DIR = ROOT / "templates"
+
+
+# --- SEO helpers ---
+
+def build_jsonld(data):
+    """Return a <script> tag containing JSON-LD structured data."""
+    return f'<script type="application/ld+json">{json.dumps(data, ensure_ascii=False)}</script>'
+
+
+def parse_episode_date(date_str):
+    """Convert 'February 10, 2026' to a datetime object."""
+    return datetime.strptime(date_str, "%B %d, %Y")
+
+
+def duration_to_iso(duration_str):
+    """Convert '69 min' to 'PT69M'."""
+    minutes = int(duration_str.split()[0])
+    return f"PT{minutes}M"
+
+
+def smart_truncate(text, max_length=155):
+    """Truncate at sentence or word boundary instead of mid-word."""
+    if len(text) <= max_length:
+        return text
+    truncated = text[:max_length]
+    last_period = truncated.rfind('. ')
+    if last_period > max_length * 0.5:
+        return truncated[:last_period + 1]
+    last_space = truncated.rfind(' ')
+    if last_space > 0:
+        return truncated[:last_space] + "\u2026"
+    return truncated + "\u2026"
+
+
+def build_podcast_series_jsonld():
+    """JSON-LD for PodcastSeries, included on every page."""
+    return {
+        "@context": "https://schema.org",
+        "@type": "PodcastSeries",
+        "name": "The Melting Pod",
+        "description": "Stories about our dysfunctional immigration system and where we go from here.",
+        "url": f"{SITE_URL}/",
+        "image": f"{SITE_URL}/The_Melting_Pod_Podcast_Logo_3000.png",
+        "author": [
+            {"@type": "Person", "name": "Claire Trickler-McNulty"},
+            {"@type": "Person", "name": "Amanda Baran"},
+            {"@type": "Person", "name": "Doug Rand"},
+        ],
+        "webFeed": f"{SITE_URL}/feed.xml",
+    }
 
 def load_episodes():
     with open(DATA_DIR / "episodes.json", "r") as f:
@@ -55,7 +115,20 @@ def build_nav(active_page):
         mobile_links.append(f'      <a href="{href}" class="mobile-menu__link{mobile_active}">{label}</a>')
     return "\n".join(nav_links), "\n".join(mobile_links)
 
-def build_head(title, description):
+def build_head(title, description, *, page_url="", og_image="", og_type="website", published_date="", jsonld=None):
+    og_img = f"{SITE_URL}/{og_image}" if og_image else f"{SITE_URL}/The_Melting_Pod_Podcast_Logo_3000.png"
+    canonical = f"{SITE_URL}/{page_url}" if page_url else SITE_URL
+
+    # Article meta (for episode pages)
+    article_meta = ""
+    if published_date:
+        article_meta = f'\n  <meta property="article:published_time" content="{published_date}">'
+
+    # JSON-LD blocks
+    jsonld_html = ""
+    if jsonld:
+        jsonld_html = "\n  " + "\n  ".join(build_jsonld(block) for block in jsonld)
+
     return f'''<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -63,14 +136,23 @@ def build_head(title, description):
   <meta name="description" content="{description}">
   <meta property="og:title" content="{title}">
   <meta property="og:description" content="{description}">
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="{og_type}">
+  <meta property="og:url" content="{canonical}">
+  <meta property="og:image" content="{og_img}">
+  <meta property="og:site_name" content="The Melting Pod">{article_meta}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{title}">
+  <meta name="twitter:description" content="{description}">
+  <meta name="twitter:image" content="{og_img}">
+  <link rel="canonical" href="{canonical}">
+  <link rel="alternate" type="application/rss+xml" title="The Melting Pod" href="{SITE_URL}/feed.xml">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48 64x64 128x128 256x256" href="favicon.ico">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles7.css">
+  <link rel="stylesheet" href="styles7.css">{jsonld_html}
 </head>'''
 
 def build_nav_html(active_page):
@@ -109,16 +191,18 @@ def build_nav_html(active_page):
 def build_footer(include_newsletter=True):
     newsletter = ""
     if include_newsletter:
-        newsletter = '''
-      <div class="footer__newsletter">
+        newsletter = f'''
+      <div class="footer__newsletter" id="newsletter">
         <div class="footer__newsletter-text">
           <h4 class="footer__newsletter-title">Stay in the loop</h4>
           <p class="footer__newsletter-desc">Get updates on new episodes and immigration news.</p>
         </div>
-        <form class="footer__newsletter-form" action="#" method="post">
-          <input type="email" class="footer__newsletter-input" placeholder="Your email address" required>
+        <form class="footer__newsletter-form" action="{BEEHIIV_SUBSCRIBE_URL}" method="get" target="beehiiv-frame">
+          <input type="email" name="email" class="footer__newsletter-input" placeholder="Your email address" required>
           <button type="submit" class="btn btn--accent footer__newsletter-btn">Subscribe</button>
         </form>
+        <iframe name="beehiiv-frame" style="display:none" aria-hidden="true" tabindex="-1"></iframe>
+        <div class="footer__newsletter-success" aria-live="polite"></div>
       </div>'''
 
     return f'''  <!-- Footer -->
@@ -143,13 +227,13 @@ def build_footer(include_newsletter=True):
             <h4 class="footer__col-title">Listen</h4>
             <a href="#">Apple Podcasts</a>
             <a href="#">Spotify</a>
-            <a href="#">YouTube</a>
-            <a href="#">RSS Feed</a>
+            <a href="https://www.youtube.com/@themeltingpod">YouTube</a>
+            <a href="feed.xml">RSS Feed</a>
           </div>
           <div class="footer__col">
             <h4 class="footer__col-title">Connect</h4>
-            <a href="#">Twitter/X</a>
-            <a href="#">Bluesky</a>
+            <a href="https://bsky.app/profile/meltingpod.bsky.social">Bluesky</a>
+            <a href="https://www.instagram.com/meltingpodshow">Instagram</a>
             <a href="contact.html">Tips &amp; Press</a>
           </div>
         </div>
@@ -167,7 +251,7 @@ def build_episode_card(ep, with_image=True):
     img_html = ""
     img_class = ""
     if with_image and ep.get("image"):
-        img_html = f'\n          <img src="{ep["image"]}" alt="" class="episode-card__img">\n          <div class="episode-card__overlay"></div>'
+        img_html = f'\n          <img src="{ep["image"]}" alt="{ep.get("image_alt", ep["title"])}" class="episode-card__img">\n          <div class="episode-card__overlay"></div>'
         img_class = " episode-card--has-img"
 
     clock_svg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
@@ -209,7 +293,7 @@ def build_episode_archive_card(ep):
     if has_image:
         img_html = f'''
           <div class="episode-archive-card__img-wrap">
-            <img src="{ep['image']}" alt="" class="episode-archive-card__img">
+            <img src="{ep['image']}" alt="{ep.get('image_alt', ep['title'])}" class="episode-archive-card__img">
             <div class="episode-archive-card__img-overlay"></div>
           </div>'''
 
@@ -276,9 +360,9 @@ def build_featured_episode(ep):
     return f'''    <div class="episode-featured">
       <a href="episode-{ep['slug']}.html" class="episode-featured__card scroll-reveal">
         <div class="episode-featured__visual">
-          <img src="{img_src}" alt="" class="episode-featured__img">
+          <img src="{img_src}" alt="{ep.get('image_alt', ep['title'])}" class="episode-featured__img">
           <div class="episode-featured__overlay"></div>
-          <span class="episode-featured__badge">Latest Episode</span>
+          <span class="episode-featured__badge">Premiere Episode</span>
         </div>
         <div class="episode-featured__content">
           <div class="episode-featured__meta">
@@ -298,8 +382,8 @@ def build_featured_episode(ep):
 
 def build_index(episodes):
     """Build the homepage."""
-    latest = episodes[0]
-    recent = episodes[1:4]  # Next 3 episodes after latest
+    latest = episodes[0]  # Premiere episode (list is chronological)
+    recent = episodes[1:4]  # Next episodes in chronological order
 
     # Player embed
     if latest.get("megaphone_id"):
@@ -314,7 +398,9 @@ def build_index(episodes):
 
     head = build_head(
         "The Melting Pod &mdash; Stories About Our Dysfunctional Immigration System",
-        "Stories about our dysfunctional immigration system and where we go from here. A podcast by Claire Trickler-McNulty, Amanda Baran, and Doug Rand."
+        "Stories about our dysfunctional immigration system and where we go from here. A podcast by Claire Trickler-McNulty, Amanda Baran, and Doug Rand.",
+        page_url="index.html",
+        jsonld=[build_podcast_series_jsonld()],
     )
     nav = build_nav_html("index.html")
     footer = build_footer(include_newsletter=True)
@@ -371,7 +457,7 @@ def build_index(episodes):
         <span class="hero__hosts-label">Your hosts</span>
         <div class="hero__host-cards">
           <a href="about.html" class="hero__host-card">
-            <img src="claire.jpeg" alt="Claire Trickler-McNulty" class="hero__host-avatar">
+            <img src="claire.jpg" alt="Claire Trickler-McNulty" class="hero__host-avatar">
             <div class="hero__host-info">
               <span class="hero__host-name">Claire Trickler-McNulty</span>
             </div>
@@ -405,13 +491,17 @@ def build_index(episodes):
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
         Spotify
       </a>
-      <a href="#" class="subscribe-strip__link">
+      <a href="https://www.youtube.com/@themeltingpod" class="subscribe-strip__link">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
         YouTube
       </a>
-      <a href="#" class="subscribe-strip__link">
+      <a href="feed.xml" class="subscribe-strip__link">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><circle cx="6.18" cy="17.82" r="2.18"/><path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56zm0 5.66v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/></svg>
         RSS
+      </a>
+      <a href="#newsletter" class="subscribe-strip__link">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        Newsletter
       </a>
     </div>
   </div>
@@ -422,7 +512,7 @@ def build_index(episodes):
   <!-- Latest Episode -->
   <section class="latest">
     <div class="container">
-      <div class="section-label">Latest Episode</div>
+      <div class="section-label">Premiere Episode</div>
       <div class="latest__card scroll-reveal">
         <div class="latest__meta">
           <span class="latest__date">{latest['date']}</span>
@@ -466,8 +556,9 @@ def build_index(episodes):
         <div class="subscribe-cta__buttons">
           <a href="#" class="platform-btn">Apple Podcasts</a>
           <a href="#" class="platform-btn">Spotify</a>
-          <a href="#" class="platform-btn">YouTube</a>
-          <a href="#" class="platform-btn">RSS Feed</a>
+          <a href="https://www.youtube.com/@themeltingpod" class="platform-btn">YouTube</a>
+          <a href="feed.xml" class="platform-btn">RSS Feed</a>
+          <a href="#newsletter" class="platform-btn">Newsletter</a>
         </div>
       </div>
     </div>
@@ -494,7 +585,9 @@ def build_episodes_page(episodes):
 
     head = build_head(
         "Episodes &mdash; The Melting Pod",
-        "All episodes of The Melting Pod. Listen to stories about our dysfunctional immigration system."
+        "All episodes of The Melting Pod. Listen to stories about our dysfunctional immigration system.",
+        page_url="episodes.html",
+        jsonld=[build_podcast_series_jsonld()],
     )
     nav = build_nav_html("episodes.html")
     footer = build_footer(include_newsletter=True)
@@ -509,7 +602,7 @@ def build_episodes_page(episodes):
 
   <!-- Page Header -->
   <header class="page-header page-header--has-img">
-    <img src="https://tile.loc.gov/storage-services/service/pnp/ds/11800/11826r.jpg" alt="" class="page-header__img">
+    <img src="https://tile.loc.gov/storage-services/service/pnp/ds/11800/11826r.jpg" alt="Immigrants arriving at Ellis Island, early 1900s" class="page-header__img">
     <div class="page-header__overlay"></div>
     <div class="container" style="position: relative; z-index: 1;">
       <h1 class="page-header__title">Episodes</h1>
@@ -519,9 +612,9 @@ def build_episodes_page(episodes):
         <span class="page-header__subscribe-label">Subscribe:</span>
         <a href="#" class="platform-btn platform-btn--dark">Apple Podcasts</a>
         <a href="#" class="platform-btn platform-btn--dark">Spotify</a>
-        <a href="#" class="platform-btn platform-btn--dark">YouTube</a>
-        <a href="#" class="platform-btn platform-btn--dark">RSS Feed</a>
-        <a href="#" class="platform-btn platform-btn--dark">Newsletter</a>
+        <a href="https://www.youtube.com/@themeltingpod" class="platform-btn platform-btn--dark">YouTube</a>
+        <a href="feed.xml" class="platform-btn platform-btn--dark">RSS Feed</a>
+        <a href="#newsletter" class="platform-btn platform-btn--dark">Newsletter</a>
       </div>
     </div>
   </header>
@@ -534,7 +627,7 @@ def build_episodes_page(episodes):
 
       <!-- Archive Grid -->
       <div class="archive-header">
-        <h2 class="archive-header__title">Previous Episodes</h2>
+        <h2 class="archive-header__title">All Episodes</h2>
         <span class="archive-header__count">{len(archive_episodes)} episodes</span>
       </div>
 
@@ -554,7 +647,77 @@ def build_episodes_page(episodes):
 </html>'''
 
 
-def build_episode_detail(ep):
+def build_episode_top_nav(prev_ep, next_ep):
+    """Build compact prev/next navigation row for the page header."""
+    chevron_left = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>'
+    chevron_right = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>'
+
+    prev_link = ""
+    if prev_ep:
+        prev_link = f'<a href="episode-{prev_ep["slug"]}.html" class="ep-topnav__link" title="{prev_ep["title"]}">{chevron_left} Prev</a>'
+
+    next_link = ""
+    if next_ep:
+        next_link = f'<a href="episode-{next_ep["slug"]}.html" class="ep-topnav__link" title="{next_ep["title"]}">Next {chevron_right}</a>'
+
+    # Build the row: prev (optional) | All Episodes | next (optional)
+    # Only show chevron on "All Episodes" when there's no prev link
+    all_chevron = "" if prev_ep else chevron_left + " "
+    parts = []
+    if prev_link:
+        parts.append(prev_link)
+    parts.append(f'<a href="episodes.html" class="ep-topnav__link ep-topnav__link--all">{all_chevron}All Episodes</a>')
+    if next_link:
+        parts.append(next_link)
+
+    sep = '<span class="ep-topnav__sep">/</span>'
+    inner = sep.join(parts)
+
+    return f'<nav class="ep-topnav" aria-label="Episode navigation">{inner}</nav>'
+
+
+def build_episode_bottom_nav(prev_ep, next_ep):
+    """Build 'Continue Listening' section with adjacent episode cards."""
+    if not prev_ep and not next_ep:
+        return ""
+
+    clock_svg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
+
+    def card(ep, direction):
+        chevron = '<polyline points="15 18 9 12 15 6"/>' if direction == "prev" else '<polyline points="9 18 15 12 9 6"/>'
+        label = "Previous Episode" if direction == "prev" else "Next Episode"
+        return f'''        <a href="episode-{ep['slug']}.html" class="ep-bottomnav__card scroll-reveal">
+          <span class="ep-bottomnav__dir">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">{chevron}</svg>
+            {label}
+          </span>
+          <h3 class="ep-bottomnav__title">{ep['title']}</h3>
+          <p class="ep-bottomnav__desc">{ep['description']}</p>
+          <span class="ep-bottomnav__meta">{ep['date']} &middot; {clock_svg} {ep['duration']}</span>
+        </a>'''
+
+    cards = []
+    if prev_ep:
+        cards.append(card(prev_ep, "prev"))
+    if next_ep:
+        cards.append(card(next_ep, "next"))
+
+    single_class = " ep-bottomnav__grid--single" if len(cards) == 1 else ""
+    cards_html = "\n".join(cards)
+
+    return f'''
+  <!-- Continue Listening -->
+  <section class="ep-bottomnav">
+    <div class="container">
+      <div class="section-label">Continue Listening</div>
+      <div class="ep-bottomnav__grid{single_class}">
+{cards_html}
+      </div>
+    </div>
+  </section>'''
+
+
+def build_episode_detail(ep, prev_ep=None, next_ep=None):
     """Build an individual episode detail page."""
     # Player (single-episode embed supports ?start= for chapter seeking)
     if ep.get("megaphone_id"):
@@ -591,7 +754,8 @@ def build_episode_detail(ep):
         summary_html = ""
 
     # Chapters / Timestamps
-    if ep.get("chapters"):
+    # TODO: Re-enable chapters once timestamps are finalized
+    if False and ep.get("chapters"):
         def time_to_seconds(t):
             """Convert 'M:SS' or 'H:MM:SS' to total seconds."""
             parts = t.split(":")
@@ -701,6 +865,7 @@ def build_episode_detail(ep):
             learn_html = "\n".join(learn_cards)
             sections.append(f'''          <div class="episode-resources__section">
             <h3 class="episode-resources__heading">Learn More</h3>
+            <p class="episode-resources__disclaimer">Amanda, Claire, and Doug express their own personal opinions on The Melting Pod. Read more about the topics in this episode:</p>
             <div class="learn-more__list">
 {learn_html}
             </div>
@@ -766,13 +931,57 @@ def build_episode_detail(ep):
 
     # Header image
     header_img = ep.get("image") or "never_again.jpg"
+    header_alt = ep.get("image_alt", ep["title"])
+
+    # SEO: episode-specific structured data
+    iso_date = parse_episode_date(ep["date"]).strftime("%Y-%m-%d")
+    ep_jsonld = {
+        "@context": "https://schema.org",
+        "@type": "PodcastEpisode",
+        "name": ep["title"],
+        "description": ep["description"],
+        "url": f"{SITE_URL}/episode-{ep['slug']}.html",
+        "datePublished": iso_date,
+        "timeRequired": duration_to_iso(ep["duration"]),
+        "episodeNumber": ep["number"],
+        "image": f"{SITE_URL}/{ep.get('image', 'The_Melting_Pod_Podcast_Logo_3000.png')}",
+        "partOfSeries": {
+            "@type": "PodcastSeries",
+            "name": "The Melting Pod",
+            "url": f"{SITE_URL}/",
+        },
+    }
+    if ep.get("megaphone_id"):
+        ep_jsonld["associatedMedia"] = {
+            "@type": "MediaObject",
+            "contentUrl": f"https://player.megaphone.fm/{ep['megaphone_id']}",
+        }
+    if ep.get("guest"):
+        ep_jsonld["actor"] = {"@type": "Person", "name": ep["guest"]["name"]}
+
+    breadcrumb_jsonld = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{SITE_URL}/"},
+            {"@type": "ListItem", "position": 2, "name": "Episodes", "item": f"{SITE_URL}/episodes.html"},
+            {"@type": "ListItem", "position": 3, "name": ep["title"]},
+        ],
+    }
 
     head = build_head(
         f'{ep["title"]} &mdash; The Melting Pod',
-        f'{ep["description"][:160]}'
+        smart_truncate(ep["description"]),
+        page_url=f"episode-{ep['slug']}.html",
+        og_image=ep.get("image", ""),
+        og_type="article",
+        published_date=iso_date,
+        jsonld=[build_podcast_series_jsonld(), ep_jsonld, breadcrumb_jsonld],
     )
     nav = build_nav_html("episodes.html")
     footer = build_footer(include_newsletter=False)
+    top_nav_html = build_episode_top_nav(prev_ep, next_ep)
+    bottom_nav_html = build_episode_bottom_nav(prev_ep, next_ep)
 
     return f'''<!DOCTYPE html>
 <html lang="en">
@@ -784,13 +993,10 @@ def build_episode_detail(ep):
 
   <!-- Page Header -->
   <header class="page-header page-header--has-img">
-    <img src="{header_img}" alt="" class="page-header__img">
+    <img src="{header_img}" alt="{header_alt}" class="page-header__img">
     <div class="page-header__overlay"></div>
     <div class="container" style="position: relative; z-index: 1;">
-      <div class="episode-detail__back">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg>
-        <a href="episodes.html">All Episodes</a>
-      </div>
+      {top_nav_html}
       <div class="episode-detail__meta">
         <span class="latest__date" style="color: var(--silver);">{ep['date']}</span>
         <span class="latest__duration" style="color: var(--silver);">{ep['duration']}</span>
@@ -821,7 +1027,7 @@ def build_episode_detail(ep):
             <h3 class="sidebar-card__title">Hosts</h3>
             <div class="sidebar-card__hosts">
               <div class="sidebar-host">
-                <img src="claire.jpeg" alt="Claire Trickler-McNulty" class="sidebar-host__avatar">
+                <img src="claire.jpg" alt="Claire Trickler-McNulty" class="sidebar-host__avatar">
                 <div>
                   <div class="sidebar-host__name">Claire Trickler-McNulty</div>
                 </div>
@@ -847,14 +1053,14 @@ def build_episode_detail(ep):
             <div class="sidebar-card__links">
               <a href="#">Apple Podcasts &rarr;</a>
               <a href="#">Spotify &rarr;</a>
-              <a href="#">YouTube &rarr;</a>
+              <a href="https://www.youtube.com/@themeltingpod">YouTube &rarr;</a>
             </div>
           </div>
         </aside>
       </div>
     </div>
   </section>
-
+{bottom_nav_html}
   </main>
 
 {footer}
@@ -866,9 +1072,29 @@ def build_episode_detail(ep):
 
 def build_about_page():
     """Build the about page (static content, not driven by episodes.json)."""
+    org_jsonld = {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "The Melting Pod",
+        "url": f"{SITE_URL}/",
+        "logo": f"{SITE_URL}/The_Melting_Pod_Podcast_Logo_3000.png",
+        "sameAs": [
+            "https://www.youtube.com/@themeltingpod",
+            "https://bsky.app/profile/meltingpod.bsky.social",
+            "https://www.instagram.com/meltingpodshow",
+        ],
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "email": "hello@meltingpod.org",
+            "contactType": "customer support",
+        },
+    }
     head = build_head(
         "About &mdash; The Melting Pod",
-        "Meet the hosts of The Melting Pod: three former federal officials who served four presidents across two decades."
+        "Meet the hosts of The Melting Pod: three former federal officials who served four presidents across two decades.",
+        page_url="about.html",
+        og_image="womens_march.jpg",
+        jsonld=[build_podcast_series_jsonld(), org_jsonld],
     )
     nav = build_nav_html("about.html")
     footer = build_footer(include_newsletter=True)
@@ -883,7 +1109,7 @@ def build_about_page():
 
   <!-- Page Header -->
   <header class="page-header page-header--has-img">
-    <img src="womens_march.jpg" alt="" class="page-header__img">
+    <img src="womens_march.jpg" alt="Two women wearing American flag headscarves sharing a moment of solidarity at a march" class="page-header__img">
     <div class="page-header__overlay"></div>
     <div class="container" style="position: relative; z-index: 1;">
       <h1 class="page-header__title">About the Show</h1>
@@ -907,7 +1133,7 @@ def build_about_page():
       <div class="hosts-grid">
 
         <div class="host-card scroll-reveal">
-          <div class="host-card__photo host-card__photo--1"><img src="claire.jpeg" alt="Claire Trickler-McNulty"></div>
+          <div class="host-card__photo host-card__photo--1"><img src="claire.jpg" alt="Claire Trickler-McNulty"></div>
           <div class="host-card__body">
             <h2 class="host-card__name">Claire Trickler-McNulty</h2>
             <p class="host-card__bio">Claire knows immigration enforcement and border issues inside and out. Literally&thinsp;&mdash;&thinsp;she&rsquo;s held senior roles at ICE and at a leading nonprofit defending kids against ICE. Her career has spanned the full arc of immigration enforcement policy, giving her a rare perspective that bridges government and advocacy.</p>
@@ -948,7 +1174,10 @@ def build_contact_page():
     """Build the contact page (static content)."""
     head = build_head(
         "Contact &mdash; The Melting Pod",
-        "Get in touch with The Melting Pod. Media inquiries, story tips, and general questions welcome."
+        "Get in touch with The Melting Pod. Media inquiries, story tips, and general questions welcome.",
+        page_url="contact.html",
+        og_image="ice_facility.jpg",
+        jsonld=[build_podcast_series_jsonld()],
     )
     nav = build_nav_html("contact.html")
     footer = build_footer(include_newsletter=True)
@@ -963,7 +1192,7 @@ def build_contact_page():
 
   <!-- Page Header -->
   <header class="page-header page-header--has-img">
-    <img src="ice_facility.jpg" alt="" class="page-header__img">
+    <img src="ice_facility.jpg" alt="Exterior of a large immigration detention facility with security fencing" class="page-header__img">
     <div class="page-header__overlay"></div>
     <div class="container" style="position: relative; z-index: 1;">
       <h1 class="page-header__title">Get in Touch</h1>
@@ -1006,6 +1235,80 @@ def build_contact_page():
 </html>'''
 
 
+def build_sitemap(episodes):
+    """Generate sitemap.xml."""
+    urls = []
+    static_pages = [
+        ("index.html", "1.0", "weekly"),
+        ("episodes.html", "0.9", "weekly"),
+        ("about.html", "0.7", "monthly"),
+        ("contact.html", "0.5", "yearly"),
+    ]
+    for page, priority, freq in static_pages:
+        urls.append(f"""  <url>
+    <loc>{SITE_URL}/{page}</loc>
+    <priority>{priority}</priority>
+    <changefreq>{freq}</changefreq>
+  </url>""")
+
+    for ep in episodes:
+        iso_date = parse_episode_date(ep["date"]).strftime("%Y-%m-%d")
+        urls.append(f"""  <url>
+    <loc>{SITE_URL}/episode-{ep['slug']}.html</loc>
+    <lastmod>{iso_date}</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>""")
+
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{chr(10).join(urls)}
+</urlset>
+"""
+
+
+def build_robots_txt():
+    """Generate robots.txt."""
+    return f"""User-agent: *
+Allow: /
+
+Sitemap: {SITE_URL}/sitemap.xml
+"""
+
+
+def build_rss_feed(episodes):
+    """Generate feed.xml (blog-style RSS 2.0)."""
+    items = []
+    for ep in reversed(episodes):  # newest first
+        pub_date = parse_episode_date(ep["date"]).strftime("%a, %d %b %Y 00:00:00 +0000")
+        desc = ep["description"].replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        items.append(f"""    <item>
+      <title>{ep['title']}</title>
+      <link>{SITE_URL}/episode-{ep['slug']}.html</link>
+      <guid isPermaLink="true">{SITE_URL}/episode-{ep['slug']}.html</guid>
+      <pubDate>{pub_date}</pubDate>
+      <description>{desc}</description>
+    </item>""")
+
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>The Melting Pod</title>
+    <link>{SITE_URL}/</link>
+    <description>Stories about our dysfunctional immigration system and where we go from here.</description>
+    <language>en-us</language>
+    <atom:link href="{SITE_URL}/feed.xml" rel="self" type="application/rss+xml"/>
+    <image>
+      <url>{SITE_URL}/The_Melting_Pod_Podcast_Logo_1400.png</url>
+      <title>The Melting Pod</title>
+      <link>{SITE_URL}/</link>
+    </image>
+{chr(10).join(items)}
+  </channel>
+</rss>
+"""
+
+
 def write_file(path, content):
     with open(path, "w") as f:
         f.write(content)
@@ -1016,7 +1319,10 @@ def main():
     clean = "--clean" in sys.argv
 
     all_episodes = load_episodes()
-    episodes = [ep for ep in all_episodes if ep.get("published", True)]
+    episodes = sorted(
+        [ep for ep in all_episodes if ep.get("published", True)],
+        key=lambda ep: ep["number"],
+    )
     skipped = len(all_episodes) - len(episodes)
     msg = f"Loaded {len(episodes)} episodes from data/episodes.json"
     if skipped:
@@ -1038,9 +1344,11 @@ def main():
     # Episodes listing
     write_file(ROOT / "episodes.html", build_episodes_page(episodes))
 
-    # Individual episode pages
-    for ep in episodes:
-        write_file(ROOT / f"episode-{ep['slug']}.html", build_episode_detail(ep))
+    # Individual episode pages (with prev/next navigation)
+    for i, ep in enumerate(episodes):
+        prev_ep = episodes[i - 1] if i > 0 else None
+        next_ep = episodes[i + 1] if i < len(episodes) - 1 else None
+        write_file(ROOT / f"episode-{ep['slug']}.html", build_episode_detail(ep, prev_ep, next_ep))
 
     # About page
     write_file(ROOT / "about.html", build_about_page())
@@ -1048,7 +1356,12 @@ def main():
     # Contact page
     write_file(ROOT / "contact.html", build_contact_page())
 
-    print(f"\nDone! Built {2 + len(episodes) + 2} pages.")
+    # SEO files
+    write_file(ROOT / "sitemap.xml", build_sitemap(episodes))
+    write_file(ROOT / "robots.txt", build_robots_txt())
+    write_file(ROOT / "feed.xml", build_rss_feed(episodes))
+
+    print(f"\nDone! Built {2 + len(episodes) + 2} pages + sitemap.xml, robots.txt, feed.xml.")
     print("\nTo add a new episode:")
     print("  1. Add an entry to data/episodes.json")
     print("  2. Run: python build.py")
