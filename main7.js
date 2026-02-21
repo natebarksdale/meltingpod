@@ -7,6 +7,19 @@
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // --- drand.love randomness beacon — subtle animation variation seed ---
+  // (Yes, that drand.)
+  var drandSeed = null;
+  var drandReady = fetch('https://api.drand.sh/public/latest')
+    .then(function (r) { return r.json(); })
+    .then(function (d) { drandSeed = d.randomness; })
+    .catch(function () { drandSeed = Date.now().toString(16).padStart(64, '0'); });
+
+  function drandRange(offset, min, max) {
+    if (!drandSeed) return (min + max) / 2;
+    return min + (parseInt(drandSeed.slice(offset, offset + 8), 16) / 0xFFFFFFFF) * (max - min);
+  }
+
   // --- Nav scroll effect ---
   const nav = document.getElementById('nav');
   if (nav) {
@@ -109,19 +122,26 @@
 
         if (isFirstVisit) {
           var letters = svg.querySelectorAll('[id^="_"]');
-          letters.forEach(function (letter, i) {
+          letters.forEach(function (letter) {
             letter.style.transformBox = 'fill-box';
             letter.style.transformOrigin = 'center center';
             letter.style.opacity = '0';
-            letter.style.transform = 'translateY(6px)';
-            letter.style.transition = 'opacity 0.45s ease-out, transform 0.45s ease-out';
-            letter.style.transitionDelay = (0.4 + i * 0.045) + 's';
           });
-          requestAnimationFrame(function () {
+          // Wait for drand seed before setting timing
+          drandReady.then(function () {
+            var stagger = drandRange(40, 0.035, 0.055);
+            var dropPx = drandRange(48, 4, 8);
+            letters.forEach(function (letter, i) {
+              letter.style.transform = 'translateY(' + dropPx + 'px)';
+              letter.style.transition = 'opacity 0.45s ease-out, transform 0.45s ease-out';
+              letter.style.transitionDelay = (0.4 + i * stagger) + 's';
+            });
             requestAnimationFrame(function () {
-              letters.forEach(function (letter) {
-                letter.style.opacity = '1';
-                letter.style.transform = 'translateY(0)';
+              requestAnimationFrame(function () {
+                letters.forEach(function (letter) {
+                  letter.style.opacity = '1';
+                  letter.style.transform = 'translateY(0)';
+                });
               });
             });
           });
@@ -140,12 +160,6 @@
         var easeOutCubic = function (t) { return 1 - Math.pow(1 - t, 3); };
         var easeOutQuart = function (t) { return 1 - Math.pow(1 - t, 4); };
         function lerpArr(a, b, t) { return a.map(function (v, i) { return v + (b[i] - v) * t; }); }
-
-        // Animation config (user's chosen settings from prototype)
-        var DURATION = 3400;
-        var DROP = 200;
-        var ROTATION = -18;
-        var LOBE_SCALE = 1.15;
 
         // Crown keyframe matrices: F1 (tilted on head) -> F2 (straightened) -> F3 (tilted again)
         var crownF1 = [1.832551, 0.416626, -0.416626, 1.832551, 95.351392, 1692.706607];
@@ -171,108 +185,108 @@
 
         var meltAnimId = null;
 
-        function setMeltFrame(t, ct) {
-          // Wrapper: rotation + vertical drop centered on viewBox (700,700)
-          var rot = ROTATION * (1 - t);
-          var dropY = -DROP * (1 - t);
-          mWrapper.setAttribute('transform',
-            'translate(700,700) rotate(' + rot + ') translate(0,' + dropY + ') translate(-700,-700)');
+        // Wait for drand seed, then initialize with varied constants
+        drandReady.then(function () {
+          // Animation config — seeded by drand.love beacon
+          var DURATION = drandRange(0, 2800, 3800);
+          var DROP = drandRange(8, 160, 230);
+          var ROTATION = drandRange(16, -22, -14);
+          var LOBE_SCALE = drandRange(24, 1.05, 1.25);
+          var BOUNCE_PEAK = drandRange(32, 0.18, 0.32);
+          var BOUNCE_OUT = 500;
+          var BOUNCE_IN = 1400;
 
-          // Crown: smooth pass through F2
-          var crownVals;
-          if (ct < 0.5) {
-            crownVals = lerpArr(crownF1, crownF2, ct * 2);
+          function setMeltFrame(t, ct) {
+            var rot = ROTATION * (1 - t);
+            var dropY = -DROP * (1 - t);
+            mWrapper.setAttribute('transform',
+              'translate(700,700) rotate(' + rot + ') translate(0,' + dropY + ') translate(-700,-700)');
+
+            var crownVals;
+            if (ct < 0.5) {
+              crownVals = lerpArr(crownF1, crownF2, ct * 2);
+            } else {
+              crownVals = lerpArr(crownF2, crownF3, (ct - 0.5) * 2);
+            }
+            mCrown.setAttribute('transform', 'matrix(' + crownVals.join(',') + ')');
+
+            var circleVals = lerpArr(circleF1, circleF3, t);
+            mCircle.setAttribute('transform', 'matrix(' + circleVals.join(',') + ')');
+
+            var lobeT = 1 - t;
+            var ls = LOBE_SCALE;
+            mLL1.setAttribute('transform', 'translate(' + (lobeMaxLL1[0]*lobeT*ls) + ',' + (lobeMaxLL1[1]*lobeT*ls) + ')');
+            mLL2.setAttribute('transform', 'translate(' + (lobeMaxLL2[0]*lobeT*ls) + ',' + (lobeMaxLL2[1]*lobeT*ls) + ')');
+            mRL1.setAttribute('transform', 'translate(' + (lobeMaxRL1[0]*lobeT*ls) + ',' + (lobeMaxRL1[1]*lobeT*ls) + ')');
+          }
+
+          function playMelt(onDone) {
+            if (meltAnimId) { cancelAnimationFrame(meltAnimId); meltAnimId = null; }
+            function tick(startTime, timestamp) {
+              var elapsed = timestamp - startTime;
+              var rawT = Math.min(elapsed / DURATION, 1);
+              setMeltFrame(easeOutCubic(rawT), easeOutQuart(rawT));
+              if (rawT < 1) {
+                meltAnimId = requestAnimationFrame(function (ts) { tick(startTime, ts); });
+              } else {
+                meltAnimId = null;
+                if (onDone) onDone();
+              }
+            }
+            meltAnimId = requestAnimationFrame(function (ts) { tick(ts, ts); });
+          }
+
+          function playBounceMelt(onDone) {
+            if (meltAnimId) { cancelAnimationFrame(meltAnimId); meltAnimId = null; }
+            function tickOut(startTime, timestamp) {
+              var elapsed = timestamp - startTime;
+              var rawT = Math.min(elapsed / BOUNCE_OUT, 1);
+              var progress = easeOutCubic(rawT) * BOUNCE_PEAK;
+              setMeltFrame(1 - progress, 1 - progress);
+              if (rawT < 1) {
+                meltAnimId = requestAnimationFrame(function (ts) { tickOut(startTime, ts); });
+              } else {
+                meltAnimId = requestAnimationFrame(function (ts) { tickIn(ts, ts); });
+              }
+            }
+            function tickIn(startTime, timestamp) {
+              var elapsed = timestamp - startTime;
+              var rawT = Math.min(elapsed / BOUNCE_IN, 1);
+              var progress = BOUNCE_PEAK * (1 - easeOutCubic(rawT));
+              setMeltFrame(1 - progress, 1 - progress);
+              if (rawT < 1) {
+                meltAnimId = requestAnimationFrame(function (ts) { tickIn(startTime, ts); });
+              } else {
+                meltAnimId = null;
+                if (onDone) onDone();
+              }
+            }
+            meltAnimId = requestAnimationFrame(function (ts) { tickOut(ts, ts); });
+          }
+
+          // Entrance behavior
+          if (isFirstVisit) {
+            svg.style.opacity = '0';
+            var stagger = drandRange(40, 0.035, 0.055);
+            var entranceDelay = (0.4 + 13 * stagger + 0.15) * 1000;
+            setTimeout(function () {
+              svg.style.transition = 'opacity 0.3s ease-out';
+              svg.style.opacity = '1';
+              playMelt(function () {
+                sessionStorage.setItem('meltPlayed', '1');
+              });
+            }, entranceDelay);
           } else {
-            crownVals = lerpArr(crownF2, crownF3, (ct - 0.5) * 2);
+            playBounceMelt();
           }
-          mCrown.setAttribute('transform', 'matrix(' + crownVals.join(',') + ')');
 
-          // Circle: round -> squished
-          var circleVals = lerpArr(circleF1, circleF3, t);
-          mCircle.setAttribute('transform', 'matrix(' + circleVals.join(',') + ')');
-
-          // Lobes: spread -> tucked
-          var lobeT = 1 - t;
-          var ls = LOBE_SCALE;
-          mLL1.setAttribute('transform', 'translate(' + (lobeMaxLL1[0]*lobeT*ls) + ',' + (lobeMaxLL1[1]*lobeT*ls) + ')');
-          mLL2.setAttribute('transform', 'translate(' + (lobeMaxLL2[0]*lobeT*ls) + ',' + (lobeMaxLL2[1]*lobeT*ls) + ')');
-          mRL1.setAttribute('transform', 'translate(' + (lobeMaxRL1[0]*lobeT*ls) + ',' + (lobeMaxRL1[1]*lobeT*ls) + ')');
-        }
-
-        // Play forward: F1 -> F3 (drop + melt)
-        function playMelt(onDone) {
-          if (meltAnimId) { cancelAnimationFrame(meltAnimId); meltAnimId = null; }
-          function tick(startTime, timestamp) {
-            var elapsed = timestamp - startTime;
-            var rawT = Math.min(elapsed / DURATION, 1);
-            setMeltFrame(easeOutCubic(rawT), easeOutQuart(rawT));
-            if (rawT < 1) {
-              meltAnimId = requestAnimationFrame(function (ts) { tick(startTime, ts); });
-            } else {
-              meltAnimId = null;
-              if (onDone) onDone();
-            }
-          }
-          meltAnimId = requestAnimationFrame(function (ts) { tick(ts, ts); });
-        }
-
-        // Subtle bounce: unsquish 25% then re-melt
-        var BOUNCE_PEAK = 0.25; // how far to reverse (0 = none, 1 = full)
-        var BOUNCE_OUT = 500;   // ms to unsquish
-        var BOUNCE_IN = 1400;   // ms to re-melt (slower, settling feel)
-        function playBounceMelt(onDone) {
-          if (meltAnimId) { cancelAnimationFrame(meltAnimId); meltAnimId = null; }
-          // Phase 1: ease out from t=1 to t=(1-BOUNCE_PEAK)
-          function tickOut(startTime, timestamp) {
-            var elapsed = timestamp - startTime;
-            var rawT = Math.min(elapsed / BOUNCE_OUT, 1);
-            var progress = easeOutCubic(rawT) * BOUNCE_PEAK;
-            setMeltFrame(1 - progress, 1 - progress);
-            if (rawT < 1) {
-              meltAnimId = requestAnimationFrame(function (ts) { tickOut(startTime, ts); });
-            } else {
-              // Phase 2: ease back from t=(1-BOUNCE_PEAK) to t=1
-              meltAnimId = requestAnimationFrame(function (ts) { tickIn(ts, ts); });
-            }
-          }
-          function tickIn(startTime, timestamp) {
-            var elapsed = timestamp - startTime;
-            var rawT = Math.min(elapsed / BOUNCE_IN, 1);
-            var progress = BOUNCE_PEAK * (1 - easeOutCubic(rawT));
-            setMeltFrame(1 - progress, 1 - progress);
-            if (rawT < 1) {
-              meltAnimId = requestAnimationFrame(function (ts) { tickIn(startTime, ts); });
-            } else {
-              meltAnimId = null;
-              if (onDone) onDone();
-            }
-          }
-          meltAnimId = requestAnimationFrame(function (ts) { tickOut(ts, ts); });
-        }
-
-        // Entrance behavior
-        if (isFirstVisit) {
-          // First visit: fade in + full drop animation after letters finish
-          svg.style.opacity = '0';
-          var entranceDelay = (0.4 + 13 * 0.045 + 0.15) * 1000;
-          setTimeout(function () {
-            svg.style.transition = 'opacity 0.3s ease-out';
-            svg.style.opacity = '1';
-            playMelt(function () {
-              sessionStorage.setItem('meltPlayed', '1');
-            });
-          }, entranceDelay);
-        } else {
-          // Return visit: reverse-then-forward bounce
-          playBounceMelt();
-        }
-
-        // Hover: reverse-then-forward bounce
-        var isAnimating = false;
-        navLogo.addEventListener('mouseenter', function () {
-          if (isAnimating) return;
-          isAnimating = true;
-          playBounceMelt(function () { isAnimating = false; });
+          // Hover: reverse-then-forward bounce
+          var isAnimating = false;
+          navLogo.addEventListener('mouseenter', function () {
+            if (isAnimating) return;
+            isAnimating = true;
+            playBounceMelt(function () { isAnimating = false; });
+          });
         });
       });
     }
@@ -344,5 +358,45 @@
         // Graceful degradation: img stays as-is
       });
   }
+
+  // --- Newsletter form: hidden iframe submission + inline success ---
+  var newsletterForm = document.querySelector('.footer__newsletter-form');
+  if (newsletterForm) {
+    newsletterForm.addEventListener('submit', function () {
+      var input = newsletterForm.querySelector('.footer__newsletter-input');
+      var btn = newsletterForm.querySelector('.footer__newsletter-btn');
+      var successEl = newsletterForm.parentElement.querySelector('.footer__newsletter-success');
+      if (!input.value || !input.validity.valid) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Subscribing\u2026';
+
+      // Form submits natively into hidden iframe via target="beehiiv-frame".
+      // Show optimistic success after a short delay (can't read cross-origin iframe).
+      setTimeout(function () {
+        newsletterForm.style.display = 'none';
+        successEl.innerHTML = '<span class="footer__newsletter-done">\u2713 Thanks! Check your inbox.</span>';
+        setTimeout(function () {
+          newsletterForm.style.display = '';
+          successEl.innerHTML = '';
+          input.value = '';
+          btn.disabled = false;
+          btn.textContent = 'Subscribe';
+        }, 5000);
+      }, 1500);
+    });
+  }
+
+  // --- Smooth scroll for #newsletter anchor links ---
+  document.querySelectorAll('a[href="#newsletter"]').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      var target = document.getElementById('newsletter');
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      var input = target.querySelector('.footer__newsletter-input');
+      if (input) setTimeout(function () { input.focus(); }, 600);
+    });
+  });
 
 })();

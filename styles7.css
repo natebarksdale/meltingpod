@@ -1048,8 +1048,9 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
 
 .footer__logo-icon {
   width: auto;
-  height: 40px;
-  margin-left: -9px;
+  height: 62px;
+  margin-left: -14px;
+  margin-top: -18px;
 }
 
 .footer__logotype {

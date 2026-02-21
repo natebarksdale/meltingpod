@@ -1,5 +1,8 @@
 .DS_Store
+.claude/
+.playwright-cli/
 .playwright-mcp/
+.vscode/
 archive/
 
 # Playwright screenshots from dev

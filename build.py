@@ -607,7 +607,7 @@ def build_episodes_page(episodes):
     <div class="container" style="position: relative; z-index: 1;">
       <h1 class="page-header__title">Episodes</h1>
       <p class="page-header__desc">Stories about immigration policy, told by the people who lived it.</p>
-      <p class="page-header__desc"><em>New stories coming soon. Catch up on everything you've missed.</em></p>
+
       <div class="page-header__subscribe">
         <span class="page-header__subscribe-label">Subscribe:</span>
         <a href="#" class="platform-btn platform-btn--dark">Apple Podcasts</a>
@@ -1136,7 +1136,7 @@ def build_about_page():
           <div class="host-card__photo host-card__photo--1"><img src="claire.jpg" alt="Claire Trickler-McNulty"></div>
           <div class="host-card__body">
             <h2 class="host-card__name">Claire Trickler-McNulty</h2>
-            <p class="host-card__bio">Claire knows immigration enforcement and border issues inside and out. Literally&thinsp;&mdash;&thinsp;she&rsquo;s held senior roles at ICE and at a leading nonprofit defending kids against ICE. Her career has spanned the full arc of immigration enforcement policy, giving her a rare perspective that bridges government and advocacy.</p>
+            <p class="host-card__bio">Claire has worked for more than 20 years on civil rights, immigration enforcement and detention. She has held senior roles at ICE and at a leading nonprofit defending kids against ICE. She currently has a fellowship through Hyphen, and is working on ideas for what ICE could look like in the future. Her career has spanned the full arc of immigration enforcement policy, giving her a rare perspective that bridges government and advocacy.</p>
           </div>
         </div>
 
@@ -1144,7 +1144,7 @@ def build_about_page():
           <div class="host-card__photo host-card__photo--2"><img src="amanda.jpg" alt="Amanda Baran"></div>
           <div class="host-card__body">
             <h2 class="host-card__name">Amanda Baran</h2>
-            <p class="host-card__bio">Amanda worked her way up from serving as an asylum officer to running all policy within U.S. Citizenship and Immigration Services (USCIS), an agency with 20,000 employees. Her knowledge of humanitarian immigration programs&thinsp;&mdash;&thinsp;asylum, refugee resettlement, TPS, and more&thinsp;&mdash;&thinsp;is vast and hard-earned.</p>
+            <p class="host-card__bio">Amanda has been working on immigration for over 25 years both inside and outside government. From non-profit attorney to directing policy within U.S. Citizenship and Immigration Services, an agency with 20,000 employees, her career has spanned the breadth of immigration law and policy, while her heart has remained rooted in humanitarian issues.</p>
           </div>
         </div>
 
