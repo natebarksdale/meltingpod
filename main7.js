@@ -359,10 +359,11 @@
       });
   }
 
-  // --- Newsletter form: hidden iframe submission + inline success ---
+  // --- Newsletter form: subscribe via Netlify function → Beehiiv API ---
   var newsletterForm = document.querySelector('.footer__newsletter-form');
   if (newsletterForm) {
-    newsletterForm.addEventListener('submit', function () {
+    newsletterForm.addEventListener('submit', function (e) {
+      e.preventDefault();
       var input = newsletterForm.querySelector('.footer__newsletter-input');
       var btn = newsletterForm.querySelector('.footer__newsletter-btn');
       var successEl = newsletterForm.parentElement.querySelector('.footer__newsletter-success');
@@ -371,19 +372,32 @@
       btn.disabled = true;
       btn.textContent = 'Subscribing\u2026';
 
-      // Form submits natively into hidden iframe via target="beehiiv-frame".
-      // Show optimistic success after a short delay (can't read cross-origin iframe).
-      setTimeout(function () {
-        newsletterForm.style.display = 'none';
-        successEl.innerHTML = '<span class="footer__newsletter-done">\u2713 Thanks! Check your inbox.</span>';
-        setTimeout(function () {
-          newsletterForm.style.display = '';
-          successEl.innerHTML = '';
-          input.value = '';
-          btn.disabled = false;
-          btn.textContent = 'Subscribe';
-        }, 5000);
-      }, 1500);
+      fetch('/.netlify/functions/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: input.value }),
+      })
+        .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+        .then(function (result) {
+          if (result.ok) {
+            newsletterForm.style.display = 'none';
+            successEl.innerHTML = '<span class="footer__newsletter-done">\u2713 You\u2019re subscribed!</span>';
+          } else {
+            successEl.innerHTML = '<span class="footer__newsletter-error">' + (result.data.error || 'Something went wrong.') + '</span>';
+          }
+        })
+        .catch(function () {
+          successEl.innerHTML = '<span class="footer__newsletter-error">Network error \u2014 please try again.</span>';
+        })
+        .finally(function () {
+          setTimeout(function () {
+            newsletterForm.style.display = '';
+            successEl.innerHTML = '';
+            input.value = '';
+            btn.disabled = false;
+            btn.textContent = 'Subscribe';
+          }, 5000);
+        });
     });
   }
 

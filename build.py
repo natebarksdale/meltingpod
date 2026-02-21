@@ -22,12 +22,9 @@ DATA_DIR = ROOT / "data"
 
 SITE_URL = "https://meltingpod.org"
 
-# --- Beehiiv newsletter integration ---
-# 1. Create a free account at beehiiv.com
-# 2. Set your publication ID below (Settings > Integrations > API)
-# 3. Set your subscribe page URL (e.g. "https://meltingpod.beehiiv.com/subscribe")
-BEEHIIV_PUBLICATION_ID = "YOUR_PUBLICATION_ID"
-BEEHIIV_SUBSCRIBE_URL = "https://meltingpod.beehiiv.com/subscribe"
+# Newsletter subscriptions are handled by a Netlify serverless function
+# that calls the Beehiiv API. See netlify/functions/subscribe.js.
+# Env vars BEEHIIV_API_KEY and BEEHIIV_PUBLICATION_ID are set in the Netlify dashboard.
 TEMPLATES_DIR = ROOT / "templates"
 
 
@@ -197,11 +194,10 @@ def build_footer(include_newsletter=True):
           <h4 class="footer__newsletter-title">Stay in the loop</h4>
           <p class="footer__newsletter-desc">Get updates on new episodes and immigration news.</p>
         </div>
-        <form class="footer__newsletter-form" action="{BEEHIIV_SUBSCRIBE_URL}" method="get" target="beehiiv-frame">
+        <form class="footer__newsletter-form">
           <input type="email" name="email" class="footer__newsletter-input" placeholder="Your email address" required>
           <button type="submit" class="btn btn--accent footer__newsletter-btn">Subscribe</button>
         </form>
-        <iframe name="beehiiv-frame" style="display:none" aria-hidden="true" tabindex="-1"></iframe>
         <div class="footer__newsletter-success" aria-live="polite"></div>
       </div>'''
 
