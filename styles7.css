@@ -402,7 +402,6 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
 
 .hero__cta-btn {
   align-self: flex-start;
-  animation: fadeSlideUp 0.8s var(--ease-out) 0.6s both;
 }
 
 .hero__badge {
@@ -529,6 +528,63 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero Trailer (expand-on-click player) */
+.hero__trailer {
+  align-self: flex-start;
+  max-width: 480px;
+  width: 100%;
+  animation: fadeSlideUp 0.8s var(--ease-out) 0.6s both;
+}
+
+.hero__trailer .hero__cta-btn {
+  cursor: pointer;
+  border: 1.5px solid transparent;
+}
+
+.hero__trailer-player {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s var(--ease-out),
+              opacity 0.35s var(--ease-out),
+              margin-top 0.4s var(--ease-out);
+  opacity: 0;
+  margin-top: 0;
+}
+
+.hero__trailer-player > * {
+  overflow: hidden;
+}
+
+.hero__trailer--open .hero__trailer-player {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: var(--space-md);
+}
+
+.hero__trailer-player-inner {
+  background: var(--navy-light);
+  border-radius: 10px;
+  padding: 0.5rem;
+}
+
+.hero__trailer-player-inner iframe {
+  display: block;
+  border: none;
+  border-radius: 6px;
+  width: 100%;
+}
+
+.hero__trailer--open .hero__cta-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.hero__trailer--open .hero__cta-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+  transform: none;
 }
 
 /* ============================================
@@ -1192,6 +1248,11 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
   overflow: hidden;
 }
 
+.page-header--tall {
+  padding-bottom: var(--space-3xl);
+  min-height: 550px;
+}
+
 .page-header__img {
   position: absolute;
   inset: 0;
@@ -1813,7 +1874,7 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
    ============================================ */
 
 .episode-detail {
-  padding: var(--space-3xl) 0;
+  padding: var(--space-3xl) 0 var(--space-xl);
 }
 
 .episode-detail__grid {
@@ -2579,6 +2640,16 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
 .contact-channel {
   display: flex;
   gap: var(--space-md);
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: var(--space-sm) var(--space-md);
+  margin: 0 calc(-1 * var(--space-md));
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-channel:hover {
+  background: rgba(232, 145, 58, 0.05);
 }
 
 .contact-channel__icon {
@@ -2591,6 +2662,12 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.contact-channel:hover .contact-channel__icon {
+  background: rgba(232, 145, 58, 0.18);
+  color: var(--amber-dark);
 }
 
 .contact-channel__icon svg {
@@ -2607,6 +2684,11 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
 .contact-channel__value {
   font-size: 0.85rem;
   color: var(--slate);
+  transition: color 0.2s ease;
+}
+
+.contact-channel:hover .contact-channel__value {
+  color: var(--amber-dark);
 }
 
 /* Form */
@@ -2722,7 +2804,7 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
    ============================================ */
 
 .ep-bottomnav {
-  padding: var(--space-2xl) 0 var(--space-3xl);
+  padding: var(--space-2xl) 0;
 }
 
 .ep-bottomnav__grid {
@@ -2882,6 +2964,8 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
   }
 
   .hero__content { padding-bottom: var(--space-xl); }
+
+  .hero__trailer { max-width: 100%; }
 
   .hero__host-cards {
     flex-direction: column;

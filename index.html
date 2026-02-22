@@ -16,15 +16,15 @@
   <meta name="twitter:description" content="Stories about our dysfunctional immigration system and where we go from here. A podcast by Claire Trickler-McNulty, Amanda Baran, and Doug Rand.">
   <meta name="twitter:image" content="https://meltingpod.org/The_Melting_Pod_Podcast_Logo_3000.png">
   <link rel="canonical" href="https://meltingpod.org/index.html">
-  <link rel="alternate" type="application/rss+xml" title="The Melting Pod" href="https://meltingpod.org/feed.xml">
+  <link rel="alternate" type="application/rss+xml" title="The Melting Pod" href="https://feeds.megaphone.fm/PLMD2833058809">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48 64x64 128x128 256x256" href="favicon.ico">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles7.css?v=90ef5fcd">
-  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "PodcastSeries", "name": "The Melting Pod", "description": "Stories about our dysfunctional immigration system and where we go from here.", "url": "https://meltingpod.org/", "image": "https://meltingpod.org/The_Melting_Pod_Podcast_Logo_3000.png", "author": [{"@type": "Person", "name": "Claire Trickler-McNulty"}, {"@type": "Person", "name": "Amanda Baran"}, {"@type": "Person", "name": "Doug Rand"}], "webFeed": "https://meltingpod.org/feed.xml"}</script>
+  <link rel="stylesheet" href="styles7.css?v=32567450">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "PodcastSeries", "name": "The Melting Pod", "description": "Stories about our dysfunctional immigration system and where we go from here.", "url": "https://meltingpod.org/", "image": "https://meltingpod.org/The_Melting_Pod_Podcast_Logo_3000.png", "author": [{"@type": "Person", "name": "Claire Trickler-McNulty"}, {"@type": "Person", "name": "Amanda Baran"}, {"@type": "Person", "name": "Doug Rand"}], "webFeed": "https://feeds.megaphone.fm/PLMD2833058809"}</script>
 </head>
 <body>
   <a href="#main" class="skip-link">Skip to content</a>
@@ -99,10 +99,15 @@
         <span class="hero__title-line">immigration system</span>
       </h1>
       <p class="hero__subtitle">Two decades under four presidents taught us how this system actually works &mdash; and why it doesn&rsquo;t. Now we&rsquo;re telling those stories.</p>
-      <a href="episodes.html" class="btn btn--primary hero__cta-btn">
-        <svg class="btn__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        Listen to Trailer
-      </a>
+      <div class="hero__trailer" id="heroTrailer">
+        <button class="btn btn--primary hero__cta-btn" id="trailerToggle" aria-expanded="false" aria-controls="trailerPlayer">
+          <svg class="btn__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <span class="hero__trailer-label">Listen to Trailer</span>
+        </button>
+        <div class="hero__trailer-player" id="trailerPlayer" aria-hidden="true"
+             data-src="https://player.megaphone.fm/PLMD2689917559">
+        </div>
+      </div>
     </div>
     <!-- Host strip at bottom of hero -->
     <div class="hero__hosts-strip">
@@ -136,11 +141,11 @@
   <div class="subscribe-strip">
     <div class="subscribe-strip__inner">
       <span class="subscribe-strip__label">Subscribe:</span>
-      <a href="#" class="subscribe-strip__link">
+      <a href="https://podcasts.apple.com/us/podcast/the-melting-pod/id1879323085" class="subscribe-strip__link">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
         Apple Podcasts
       </a>
-      <a href="#" class="subscribe-strip__link">
+      <a href="https://open.spotify.com/show/4QEIjShsqmjMvvLsmdU2Yb" class="subscribe-strip__link">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
         Spotify
       </a>
@@ -148,7 +153,7 @@
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
         YouTube
       </a>
-      <a href="feed.xml" class="subscribe-strip__link">
+      <a href="https://feeds.megaphone.fm/PLMD2833058809" class="subscribe-strip__link">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><circle cx="6.18" cy="17.82" r="2.18"/><path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56zm0 5.66v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/></svg>
         RSS
       </a>
@@ -234,10 +239,10 @@
           <p class="subscribe-cta__desc">New stories coming soon. Subscribe wherever you listen.</p>
         </div>
         <div class="subscribe-cta__buttons">
-          <a href="#" class="platform-btn">Apple Podcasts</a>
-          <a href="#" class="platform-btn">Spotify</a>
+          <a href="https://podcasts.apple.com/us/podcast/the-melting-pod/id1879323085" class="platform-btn">Apple Podcasts</a>
+          <a href="https://open.spotify.com/show/4QEIjShsqmjMvvLsmdU2Yb" class="platform-btn">Spotify</a>
           <a href="https://www.youtube.com/@themeltingpod" class="platform-btn">YouTube</a>
-          <a href="feed.xml" class="platform-btn">RSS Feed</a>
+          <a href="https://feeds.megaphone.fm/PLMD2833058809" class="platform-btn">RSS Feed</a>
           <a href="#newsletter" class="platform-btn">Newsletter</a>
         </div>
       </div>
@@ -266,10 +271,10 @@
           </div>
           <div class="footer__col">
             <h4 class="footer__col-title">Listen</h4>
-            <a href="#">Apple Podcasts</a>
-            <a href="#">Spotify</a>
+            <a href="https://podcasts.apple.com/us/podcast/the-melting-pod/id1879323085">Apple Podcasts</a>
+            <a href="https://open.spotify.com/show/4QEIjShsqmjMvvLsmdU2Yb">Spotify</a>
             <a href="https://www.youtube.com/@themeltingpod">YouTube</a>
-            <a href="feed.xml">RSS Feed</a>
+            <a href="https://feeds.megaphone.fm/PLMD2833058809">RSS Feed</a>
           </div>
           <div class="footer__col">
             <h4 class="footer__col-title">Connect</h4>
@@ -296,6 +301,6 @@
     </div>
   </footer>
 
-  <script src="main7.js?v=9997b495"></script>
+  <script src="main7.js?v=a2b58520"></script>
 </body>
 </html>

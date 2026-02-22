@@ -335,6 +335,62 @@
     if (textEl) textEl.dataset.collapsed = textEl.textContent;
   }
 
+  // --- Hero trailer expand/collapse ---
+  var trailerToggle = document.getElementById('trailerToggle');
+  var trailerContainer = document.getElementById('heroTrailer');
+  var trailerPlayer = document.getElementById('trailerPlayer');
+
+  if (trailerToggle && trailerContainer && trailerPlayer) {
+    var trailerLoaded = false;
+
+    trailerToggle.addEventListener('click', function () {
+      var isOpen = trailerContainer.classList.toggle('hero__trailer--open');
+      trailerToggle.setAttribute('aria-expanded', isOpen);
+      trailerPlayer.setAttribute('aria-hidden', !isOpen);
+
+      var label = trailerToggle.querySelector('.hero__trailer-label');
+      var icon = trailerToggle.querySelector('.btn__icon');
+
+      if (isOpen) {
+        // Lazy-load the iframe on first open
+        if (!trailerLoaded) {
+          var inner = document.createElement('div');
+          inner.className = 'hero__trailer-player-inner';
+
+          var iframe = document.createElement('iframe');
+          iframe.setAttribute('frameborder', '0');
+          iframe.setAttribute('height', '200');
+          iframe.setAttribute('scrolling', 'no');
+          iframe.setAttribute('width', '100%');
+          iframe.setAttribute('title', 'Listen: The Melting Pod Trailer');
+          iframe.src = trailerPlayer.dataset.src;
+
+          inner.appendChild(iframe);
+          trailerPlayer.appendChild(inner);
+          trailerLoaded = true;
+        }
+
+        if (label) label.textContent = 'Close Trailer';
+        if (icon) {
+          icon.setAttribute('fill', 'none');
+          icon.setAttribute('stroke', 'currentColor');
+          icon.setAttribute('stroke-width', '2.5');
+          icon.setAttribute('stroke-linecap', 'round');
+          icon.innerHTML = '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+        }
+      } else {
+        if (label) label.textContent = 'Listen to Trailer';
+        if (icon) {
+          icon.setAttribute('fill', 'currentColor');
+          icon.removeAttribute('stroke');
+          icon.removeAttribute('stroke-width');
+          icon.removeAttribute('stroke-linecap');
+          icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+        }
+      }
+    });
+  }
+
   // --- SVG injection utility ---
   function injectSVG(imgEl, callback) {
     if (!imgEl || !imgEl.src) return;

@@ -22,6 +22,12 @@ ROOT = Path(__file__).parent
 DATA_DIR = ROOT / "data"
 
 SITE_URL = "https://meltingpod.org"
+TRAILER_MEGAPHONE_ID = "PLMD2689917559"
+
+APPLE_PODCASTS_URL = "https://podcasts.apple.com/us/podcast/the-melting-pod/id1879323085"
+SPOTIFY_URL = "https://open.spotify.com/show/4QEIjShsqmjMvvLsmdU2Yb"
+YOUTUBE_URL = "https://www.youtube.com/@themeltingpod"
+RSS_FEED_URL = "https://feeds.megaphone.fm/PLMD2833058809"
 
 # Newsletter subscriptions are handled by a Netlify serverless function
 # that calls the Beehiiv API. See netlify/functions/subscribe.js.
@@ -86,7 +92,7 @@ def build_podcast_series_jsonld():
             {"@type": "Person", "name": "Amanda Baran"},
             {"@type": "Person", "name": "Doug Rand"},
         ],
-        "webFeed": f"{SITE_URL}/feed.xml",
+        "webFeed": RSS_FEED_URL,
     }
 
 def load_episodes():
@@ -154,7 +160,7 @@ def build_head(title, description, *, page_url="", og_image="", og_type="website
   <meta name="twitter:description" content="{description}">
   <meta name="twitter:image" content="{og_img}">
   <link rel="canonical" href="{canonical}">
-  <link rel="alternate" type="application/rss+xml" title="The Melting Pod" href="{SITE_URL}/feed.xml">
+  <link rel="alternate" type="application/rss+xml" title="The Melting Pod" href="{RSS_FEED_URL}">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48 64x64 128x128 256x256" href="favicon.ico">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -233,10 +239,10 @@ def build_footer(include_newsletter=True):
           </div>
           <div class="footer__col">
             <h4 class="footer__col-title">Listen</h4>
-            <a href="#">Apple Podcasts</a>
-            <a href="#">Spotify</a>
-            <a href="https://www.youtube.com/@themeltingpod">YouTube</a>
-            <a href="feed.xml">RSS Feed</a>
+            <a href="{APPLE_PODCASTS_URL}">Apple Podcasts</a>
+            <a href="{SPOTIFY_URL}">Spotify</a>
+            <a href="{YOUTUBE_URL}">YouTube</a>
+            <a href="{RSS_FEED_URL}">RSS Feed</a>
           </div>
           <div class="footer__col">
             <h4 class="footer__col-title">Connect</h4>
@@ -454,10 +460,15 @@ def build_index(episodes):
         <span class="hero__title-line">immigration system</span>
       </h1>
       <p class="hero__subtitle">Two decades under four presidents taught us how this system actually works &mdash; and why it doesn&rsquo;t. Now we&rsquo;re telling those stories.</p>
-      <a href="episodes.html" class="btn btn--primary hero__cta-btn">
-        <svg class="btn__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        Listen to Trailer
-      </a>
+      <div class="hero__trailer" id="heroTrailer">
+        <button class="btn btn--primary hero__cta-btn" id="trailerToggle" aria-expanded="false" aria-controls="trailerPlayer">
+          <svg class="btn__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <span class="hero__trailer-label">Listen to Trailer</span>
+        </button>
+        <div class="hero__trailer-player" id="trailerPlayer" aria-hidden="true"
+             data-src="https://player.megaphone.fm/{TRAILER_MEGAPHONE_ID}">
+        </div>
+      </div>
     </div>
     <!-- Host strip at bottom of hero -->
     <div class="hero__hosts-strip">
@@ -491,19 +502,19 @@ def build_index(episodes):
   <div class="subscribe-strip">
     <div class="subscribe-strip__inner">
       <span class="subscribe-strip__label">Subscribe:</span>
-      <a href="#" class="subscribe-strip__link">
+      <a href="{APPLE_PODCASTS_URL}" class="subscribe-strip__link">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
         Apple Podcasts
       </a>
-      <a href="#" class="subscribe-strip__link">
+      <a href="{SPOTIFY_URL}" class="subscribe-strip__link">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
         Spotify
       </a>
-      <a href="https://www.youtube.com/@themeltingpod" class="subscribe-strip__link">
+      <a href="{YOUTUBE_URL}" class="subscribe-strip__link">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
         YouTube
       </a>
-      <a href="feed.xml" class="subscribe-strip__link">
+      <a href="{RSS_FEED_URL}" class="subscribe-strip__link">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><circle cx="6.18" cy="17.82" r="2.18"/><path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56zm0 5.66v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/></svg>
         RSS
       </a>
@@ -562,10 +573,10 @@ def build_index(episodes):
           <p class="subscribe-cta__desc">New stories coming soon. Subscribe wherever you listen.</p>
         </div>
         <div class="subscribe-cta__buttons">
-          <a href="#" class="platform-btn">Apple Podcasts</a>
-          <a href="#" class="platform-btn">Spotify</a>
-          <a href="https://www.youtube.com/@themeltingpod" class="platform-btn">YouTube</a>
-          <a href="feed.xml" class="platform-btn">RSS Feed</a>
+          <a href="{APPLE_PODCASTS_URL}" class="platform-btn">Apple Podcasts</a>
+          <a href="{SPOTIFY_URL}" class="platform-btn">Spotify</a>
+          <a href="{YOUTUBE_URL}" class="platform-btn">YouTube</a>
+          <a href="{RSS_FEED_URL}" class="platform-btn">RSS Feed</a>
           <a href="#newsletter" class="platform-btn">Newsletter</a>
         </div>
       </div>
@@ -618,10 +629,10 @@ def build_episodes_page(episodes):
 
       <div class="page-header__subscribe">
         <span class="page-header__subscribe-label">Subscribe:</span>
-        <a href="#" class="platform-btn platform-btn--dark">Apple Podcasts</a>
-        <a href="#" class="platform-btn platform-btn--dark">Spotify</a>
-        <a href="https://www.youtube.com/@themeltingpod" class="platform-btn platform-btn--dark">YouTube</a>
-        <a href="feed.xml" class="platform-btn platform-btn--dark">RSS Feed</a>
+        <a href="{APPLE_PODCASTS_URL}" class="platform-btn platform-btn--dark">Apple Podcasts</a>
+        <a href="{SPOTIFY_URL}" class="platform-btn platform-btn--dark">Spotify</a>
+        <a href="{YOUTUBE_URL}" class="platform-btn platform-btn--dark">YouTube</a>
+        <a href="{RSS_FEED_URL}" class="platform-btn platform-btn--dark">RSS Feed</a>
         <a href="#newsletter" class="platform-btn platform-btn--dark">Newsletter</a>
       </div>
     </div>
@@ -1059,9 +1070,9 @@ def build_episode_detail(ep, prev_ep=None, next_ep=None):
           <div class="sidebar-card">
             <h3 class="sidebar-card__title">Listen On</h3>
             <div class="sidebar-card__links">
-              <a href="#">Apple Podcasts &rarr;</a>
-              <a href="#">Spotify &rarr;</a>
-              <a href="https://www.youtube.com/@themeltingpod">YouTube &rarr;</a>
+              <a href="{APPLE_PODCASTS_URL}">Apple Podcasts &rarr;</a>
+              <a href="{SPOTIFY_URL}">Spotify &rarr;</a>
+              <a href="{YOUTUBE_URL}">YouTube &rarr;</a>
             </div>
           </div>
         </aside>
@@ -1087,7 +1098,9 @@ def build_about_page():
         "url": f"{SITE_URL}/",
         "logo": f"{SITE_URL}/The_Melting_Pod_Podcast_Logo_3000.png",
         "sameAs": [
-            "https://www.youtube.com/@themeltingpod",
+            APPLE_PODCASTS_URL,
+            SPOTIFY_URL,
+            YOUTUBE_URL,
             "https://bsky.app/profile/meltingpod.bsky.social",
             "https://www.instagram.com/meltingpodshow",
         ],
@@ -1199,7 +1212,7 @@ def build_contact_page():
   <main id="main">
 
   <!-- Page Header -->
-  <header class="page-header page-header--has-img">
+  <header class="page-header page-header--has-img page-header--tall">
     <img src="ice_facility.jpg" alt="Exterior of a large immigration detention facility with security fencing" class="page-header__img">
     <div class="page-header__overlay"></div>
     <div class="container" style="position: relative; z-index: 1;">
@@ -1212,24 +1225,24 @@ def build_contact_page():
   <section class="contact-section">
     <div class="container">
       <div class="contact-channels">
-        <div class="contact-channel scroll-reveal">
+        <a href="mailto:hello@meltingpod.org" class="contact-channel scroll-reveal">
           <div class="contact-channel__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           </div>
           <div>
             <div class="contact-channel__label">Feedback &amp; Questions</div>
-            <div class="contact-channel__value"><a href="mailto:hello@meltingpod.org">hello@meltingpod.org</a></div>
+            <div class="contact-channel__value">hello@meltingpod.org</div>
           </div>
-        </div>
-        <div class="contact-channel scroll-reveal">
+        </a>
+        <a href="mailto:press@meltingpod.org" class="contact-channel scroll-reveal">
           <div class="contact-channel__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           </div>
           <div>
             <div class="contact-channel__label">Press &amp; Media</div>
-            <div class="contact-channel__value"><a href="mailto:press@meltingpod.org">press@meltingpod.org</a></div>
+            <div class="contact-channel__value">press@meltingpod.org</div>
           </div>
-        </div>
+        </a>
       </div>
     </div>
   </section>
