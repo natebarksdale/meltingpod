@@ -773,8 +773,7 @@ def build_episode_detail(ep, prev_ep=None, next_ep=None):
         summary_html = ""
 
     # Chapters / Timestamps
-    # TODO: Re-enable chapters once timestamps are finalized
-    if False and ep.get("chapters"):
+    if ep.get("chapters"):
         def time_to_seconds(t):
             """Convert 'M:SS' or 'H:MM:SS' to total seconds."""
             parts = t.split(":")
