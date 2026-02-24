@@ -883,7 +883,7 @@ def build_episode_detail(ep, prev_ep=None, next_ep=None):
             learn_html = "\n".join(learn_cards)
             sections.append(f'''          <div class="episode-resources__section">
             <h3 class="episode-resources__heading">Learn More</h3>
-            <p class="episode-resources__disclaimer">Amanda, Claire, and Doug express their own personal opinions on The Melting Pod. Read more about the topics in this episode:</p>
+            <p class="episode-resources__disclaimer">Amanda, Claire, and Doug express their own personal opinions on The Melting Pod. This episode was produced by Michael Palmer (<a href="https://palmer.media">palmer.media</a>). Read more about the topics in this episode:</p>
             <div class="learn-more__list">
 {learn_html}
             </div>
