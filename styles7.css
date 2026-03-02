@@ -699,6 +699,7 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
   line-height: 1.2;
   margin-bottom: var(--space-md);
   color: var(--navy);
+  text-wrap: pretty;
 }
 
 .latest__desc {
@@ -856,6 +857,7 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
   line-height: 1.3;
   margin: var(--space-sm) 0 var(--space-sm);
   color: var(--navy);
+  text-wrap: pretty;
 }
 
 .episode-card__desc {
@@ -1279,6 +1281,7 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
   font-size: clamp(2.2rem, 5vw, 3.5rem);
   font-weight: 400;
   margin-bottom: var(--space-sm);
+  text-wrap: pretty;
 }
 
 .page-header__desc {
@@ -1421,6 +1424,7 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
   line-height: 1.2;
   color: var(--navy);
   margin-bottom: var(--space-md);
+  text-wrap: pretty;
 }
 
 .episode-featured__desc {
@@ -1677,6 +1681,7 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
   color: var(--navy);
   margin-bottom: var(--space-sm);
   transition: color 0.25s;
+  text-wrap: pretty;
 }
 
 .episode-archive-card:hover .episode-archive-card__title {
