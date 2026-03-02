@@ -254,6 +254,7 @@ def build_footer(include_newsletter=True):
       </div>{newsletter}
       <div class="footer__bottom">
         <span>&copy; 2026 The Melting Pod. All rights reserved.</span>
+        <span>Website by <a href="https://natebarksdale.xyz/about/">Nate Barksdale Writing + Design</a></span>
       </div>
     </div>
   </footer>'''
