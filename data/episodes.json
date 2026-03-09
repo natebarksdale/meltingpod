@@ -45,7 +45,7 @@
     },
     "resources": [
       {"title": "Dreamers in the United States: An Overview of the Dreamer Community and Proposed Legislation", "source": "National Immigration Forum", "date": "Dec. 2, 2025", "url": "https://forumtogether.org/article/dreamers-in-the-united-states-an-overview-of-the-dreamer-community-and-proposed-legislation/", "category": "learn"},
-      {"title": "My Life as an Undocumented Immigrant", "source": "New York Times", "date": "June 22, 2011", "url": "https://www.nytimes.com/2011/06/26/magazine/my-life-as-an-undocumented-immigrant.html", "category": "learn"},
+      {"title": "My Life as an Undocumented Immigrant", "description": "by Jose Antonio Vargas", "source": "New York Times", "date": "June 22, 2011", "url": "https://www.nytimes.com/2011/06/26/magazine/my-life-as-an-undocumented-immigrant.html", "category": "learn"},
       {"title": "Astrid Silva: Meet the woman delivering the Democratic response to Trump in Spanish", "source": "ABC News", "date": "Feb. 27, 2017", "url": "https://abcnews.go.com/Politics/astrid-silva-meet-woman-delivering-democratic-response-trump/story?id=45784610", "category": "learn"},
       {"title": "How Democracy Works Now", "description": "Free to watch with a library card", "date": "2013", "url": "https://www.kanopy.com/en/product/13906274", "category": "learn"},
       {"title": "#AfghanEvac", "description": "Working to ensure the U.S. keeps its promise to our Afghan allies", "url": "https://afghanevac.org/", "category": "give", "scope": "national"},
