@@ -50,4 +50,10 @@
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
+  <url>
+    <loc>https://meltingpod.org/episode-whos-afraid-h1b.html</loc>
+    <lastmod>2026-03-17</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
 </urlset>

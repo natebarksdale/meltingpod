@@ -377,7 +377,7 @@ def build_featured_episode(ep):
         <div class="episode-featured__visual">
           <img src="{img_src}" alt="{ep.get('image_alt', ep['title'])}" class="episode-featured__img">
           <div class="episode-featured__overlay"></div>
-          <span class="episode-featured__badge">Premiere Episode</span>
+          <span class="episode-featured__badge">Latest Episode</span>
         </div>
         <div class="episode-featured__content">
           <div class="episode-featured__meta">
@@ -397,8 +397,9 @@ def build_featured_episode(ep):
 
 def build_index(episodes):
     """Build the homepage."""
-    latest = episodes[0]  # Premiere episode (list is chronological)
-    recent = episodes[1:4]  # Next episodes in chronological order
+    newest_first = list(reversed(episodes))
+    latest = newest_first[0]  # Most recent episode
+    recent = newest_first[1:4]  # Next most recent episodes
 
     # Player embed
     if latest.get("megaphone_id"):
@@ -532,7 +533,7 @@ def build_index(episodes):
   <!-- Latest Episode -->
   <section class="latest">
     <div class="container">
-      <div class="section-label">Premiere Episode</div>
+      <div class="section-label">Latest Episode</div>
       <div class="latest__card scroll-reveal">
         <div class="latest__meta">
           <span class="latest__date">{latest['date']}</span>
@@ -595,12 +596,12 @@ def build_index(episodes):
 
 def build_episodes_page(episodes):
     """Build the episodes listing page."""
-    # Featured episode (latest)
-    latest = episodes[0]
+    # Featured episode (newest)
+    latest = episodes[-1]
     featured_html = build_featured_episode(latest)
 
-    # Archive cards (all except latest)
-    archive_episodes = episodes[1:]
+    # Archive cards (all except latest, forward chronological)
+    archive_episodes = episodes[:-1]
     cards_html = "\n\n".join(build_episode_archive_card(ep) for ep in archive_episodes)
 
     head = build_head(
