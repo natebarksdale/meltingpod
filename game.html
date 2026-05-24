@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>POD SPORTS — All-Star Showdown</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<style>
+  :root {
+    --ink: #0a0e1a;
+    --ink-2: #121a2e;
+    --line: #1f2a44;
+    --accent: #ff7a1a;
+    --accent-2: #ffb547;
+    --good: #22d39a;
+    --bad: #ff3b5c;
+    --gold: #ffd24a;
+    --paper: #f4f1e8;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    color: #fff;
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #wrap {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(ellipse at center, #1a2238 0%, #050810 70%);
+  }
+  #stage {
+    position: relative;
+    width: min(100vw, 1280px);
+    aspect-ratio: 16 / 9;
+    max-height: 100vh;
+    background: #000;
+    box-shadow: 0 0 80px rgba(0,0,0,0.8);
+    overflow: hidden;
+  }
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    image-rendering: optimizeQuality;
+  }
+  .hud {
+    position: absolute;
+    pointer-events: none;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  #help {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #d9e1f1;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 700;
+    backdrop-filter: blur(6px);
+    z-index: 20;
+  }
+  #help kbd {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-bottom-width: 2px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 11px;
+    margin: 0 2px;
+  }
+  .flash {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 30;
+  }
+  @keyframes flashFx {
+    0% { opacity: 0.9; }
+    100% { opacity: 0; }
+  }
+  .flash.go { animation: flashFx 280ms ease-out; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <canvas id="game" width="1280" height="720"></canvas>
+    <div class="flash" id="flash"></div>
+    <div id="help">
+      <kbd>SPACE</kbd> Start / Shoot &nbsp;·&nbsp; <kbd>←</kbd> <kbd>→</kbd> Aim &nbsp;·&nbsp; <kbd>R</kbd> Restart
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // ---------- Core ----------
+  const cvs = document.getElementById('game');
+  const ctx = cvs.getContext('2d');
+  const flashEl = document.getElementById('flash');
+  const W = cvs.width, H = cvs.height;
+
+  const STATE = {
+    BOOT: 'boot',
+    INTRO: 'intro',
+    EVENT_INTRO: 'eventIntro',
+    READY: 'ready',
+    POWER: 'power',
+    ACCURACY: 'accuracy',
+    RESULT: 'result',
+    REPLAY: 'replay',
+    FINAL: 'final',
+  };
+
+  const SPORTS = [
+    {
+      key: 'basketball',
+      label: 'Three-Point Contest',
+      city: 'Brooklyn',
+      arena: 'The Vault',
+      home: { name: 'NEW YORK', primary: '#f37c1e', secondary: '#1a1a1a' },
+      ball: '#e26b1f',
+      court: '#c98c3e',
+      ambient: '#3a1c10',
+    },
+    {
+      key: 'soccer',
+      label: 'Penalty Kick',
+      city: 'Manchester',
+      arena: 'Old Pitch',
+      home: { name: 'CITY UNITED', primary: '#3aa6ff', secondary: '#0b2848' },
+      ball: '#ffffff',
+      court: '#2c8a3a',
+      ambient: '#0d2e1c',
+    },
+    {
+      key: 'football',
+      label: 'Field Goal',
+      city: 'Green Bay',
+      arena: 'Frozen Field',
+      home: { name: 'PACK', primary: '#22c55e', secondary: '#1a3b1c' },
+      ball: '#7a4a1e',
+      court: '#1f6a32',
+      ambient: '#0b1f12',
+    },
+    {
+      key: 'hockey',
+      label: 'Slap Shot Shootout',
+      city: 'Montreal',
+      arena: 'Le Forum',
+      home: { name: 'HABS', primary: '#e3243b', secondary: '#1a1a1a' },
+      ball: '#0a0a0a',
+      court: '#e8f1ff',
+      ambient: '#0d1830',
+    },
+    {
+      key: 'baseball',
+      label: 'Home Run Derby',
+      city: 'Boston',
+      arena: 'The Yard',
+      home: { name: 'SOX', primary: '#d11242', secondary: '#0a2240' },
+      ball: '#f8eccd',
+      court: '#7a4a1e',
+      ambient: '#1a0e08',
+    },
+  ];
+
+  const game = {
+    state: STATE.BOOT,
+    t: 0,
+    sportIndex: 0,
+    score: 0,
+    scoresPerSport: [],
+    streak: 0,
+    bestStreak: 0,
+    crowd: 0.6,
+    aim: 0,              // -1..1
+    aimDir: 1,
+    aimSpeed: 0.012,
+    power: 0,
+    powerDir: 1,
+    powerSpeed: 0.018,
+    locked: { power: null, accuracy: null },
+    shotResult: null,
+    replayT: 0,
+    msgT: 0,
+    msg: '',
+    commentary: '',
+    playerName: '',
+    playerOVR: 0,
+    targetX: 0,
+    wind: 0,
+    shake: 0,
+    confetti: [],
+    particles: [],
+    crowdSeed: Array.from({length: 220}, () => Math.random()),
+    starSeed: Array.from({length: 80}, () => Math.random()),
+    fireworks: [],
+  };
+
+  const sport = () => SPORTS[game.sportIndex];
+
+  const PLAYERS = [
+    { name: 'Reyes',   ovr: 92 },
+    { name: 'Okafor',  ovr: 88 },
+    { name: 'Hassan',  ovr: 90 },
+    { name: 'Petrova', ovr: 94 },
+    { name: 'Tanaka',  ovr: 87 },
+    { name: 'Müller',  ovr: 91 },
+    { name: 'Singh',   ovr: 89 },
+    { name: 'Carter',  ovr: 93 },
+  ];
+
+  // ---------- Utils ----------
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const ease = (t) => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
+  const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+  const easeIn = (t) => t*t*t;
+
+  function roundRect(ctx, x, y, w, h, r) {
+    if (typeof r === 'number') r = { tl: r, tr: r, br: r, bl: r };
+    ctx.beginPath();
+    ctx.moveTo(x + r.tl, y);
+    ctx.lineTo(x + w - r.tr, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r.tr);
+    ctx.lineTo(x + w, y + h - r.br);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
+    ctx.lineTo(x + r.bl, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r.bl);
+    ctx.lineTo(x, y + r.tl);
+    ctx.quadraticCurveTo(x, y, x + r.tl, y);
+    ctx.closePath();
+  }
+
+  function shadowText(text, x, y, size, color, weight = 800, align = 'center', shadow = true) {
+    ctx.save();
+    ctx.font = `${weight} ${size}px Inter, "Helvetica Neue", Arial, sans-serif`;
+    ctx.textAlign = align;
+    ctx.textBaseline = 'middle';
+    if (shadow) {
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillText(text, x + 2, y + 3);
+    }
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+    ctx.restore();
+  }
+
+  function gradientRect(x, y, w, h, c1, c2, vertical = true) {
+    const g = ctx.createLinearGradient(x, y, vertical ? x : x + w, vertical ? y + h : y);
+    g.addColorStop(0, c1);
+    g.addColorStop(1, c2);
+    ctx.fillStyle = g;
+    ctx.fillRect(x, y, w, h);
+  }
+
+  // ---------- Input ----------
+  const keys = new Set();
+  let spaceEdge = false;
+  window.addEventListener('keydown', (e) => {
+    if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space',' '].includes(e.key) || e.code === 'Space') e.preventDefault();
+    const k = (e.code === 'Space' ? 'Space' : e.key);
+    if (!keys.has(k)) {
+      keys.add(k);
+      if (k === 'Space') spaceEdge = true;
+      if (k === 'r' || k === 'R') restart();
+    }
+  });
+  window.addEventListener('keyup', (e) => {
+    const k = (e.code === 'Space' ? 'Space' : e.key);
+    keys.delete(k);
+  });
+  cvs.addEventListener('pointerdown', () => { spaceEdge = true; });
+
+  // ---------- Flow ----------
+  function restart() {
+    game.state = STATE.INTRO;
+    game.t = 0;
+    game.sportIndex = 0;
+    game.score = 0;
+    game.streak = 0;
+    game.bestStreak = 0;
+    game.scoresPerSport = SPORTS.map(() => null);
+    nextPlayer();
+  }
+
+  function nextPlayer() {
+    const p = PLAYERS[Math.floor(Math.random() * PLAYERS.length)];
+    game.playerName = p.name.toUpperCase();
+    game.playerOVR = p.ovr + Math.floor(rand(-2, 3));
+  }
+
+  function startEventIntro() {
+    game.state = STATE.EVENT_INTRO;
+    game.t = 0;
+    nextPlayer();
+    game.wind = rand(-1, 1);
+  }
+
+  function startReady() {
+    game.state = STATE.READY;
+    game.t = 0;
+    game.aim = 0;
+    game.aimDir = Math.random() < 0.5 ? 1 : -1;
+    game.power = 0;
+    game.powerDir = 1;
+    game.locked = { power: null, accuracy: null };
+  }
+
+  function takeShot() {
+    // Translate locked values into result
+    const p = game.locked.power ?? 0.5;
+    const a = Math.abs(game.locked.accuracy ?? 1);
+    const aimError = a;            // 0 = perfect center; 1 = far off
+    const sweetPower = 1 - Math.abs(p - 0.85) * 1.6;
+    const score = clamp(sweetPower * (1 - aimError * 1.1), 0, 1);
+
+    let outcome;
+    if (score > 0.85) outcome = 'SWISH';
+    else if (score > 0.65) outcome = 'GOAL';
+    else if (score > 0.4) outcome = 'CLOSE';
+    else outcome = 'MISS';
+
+    // Sport-specific labels
+    const labels = {
+      basketball: { SWISH: 'SWISH!', GOAL: 'BUCKET', CLOSE: 'RIM OUT', MISS: 'AIRBALL' },
+      soccer:     { SWISH: 'TOP CORNER!', GOAL: 'GOAL!', CLOSE: 'OFF THE POST', MISS: 'SAVED' },
+      football:   { SWISH: 'SPLIT THE UPRIGHTS!', GOAL: 'IT\'S GOOD', CLOSE: 'DOINK', MISS: 'WIDE LEFT' },
+      hockey:     { SWISH: 'TOP SHELF!', GOAL: 'SCORES!', CLOSE: 'IRON', MISS: 'GLOVE SAVE' },
+      baseball:   { SWISH: 'MOONSHOT!', GOAL: 'GONE!', CLOSE: 'OFF THE WALL', MISS: 'POPUP' },
+    };
+    const commentary = {
+      basketball: ['NOTHING BUT NET.', 'CASH MONEY.', 'IN AND OUT...', 'ARE YOU KIDDING ME?!'],
+      soccer:     ['UNSTOPPABLE.', 'BACK OF THE NET!', 'THE KEEPER GUESSED RIGHT.', 'PUT IT IN ROW Z.'],
+      football:   ['THE KICK IS UP — AND GOOD!', 'THREE POINTS!', 'OFF THE UPRIGHT!', 'NO GOOD.'],
+      hockey:     ['LIGHT THE LAMP!', 'HE SHOOTS, HE SCORES!', 'PINGS THE PIPE.', 'WHAT A SAVE.'],
+      baseball:   ['BACK, BACK, BACK — GONE!', 'GOOD-BYE, BASEBALL!', 'PLAYED OFF THE WALL.', 'CAN OF CORN.'],
+    };
+
+    game.shotResult = {
+      score,
+      outcome,
+      label: labels[sport().key][outcome],
+      commentary: commentary[sport().key][['SWISH','GOAL','CLOSE','MISS'].indexOf(outcome)],
+      points: outcome === 'SWISH' ? 30 : outcome === 'GOAL' ? 20 : outcome === 'CLOSE' ? 5 : 0,
+    };
+    game.score += game.shotResult.points;
+    game.scoresPerSport[game.sportIndex] = game.shotResult.points;
+
+    if (outcome === 'SWISH' || outcome === 'GOAL') {
+      game.streak += 1;
+      game.bestStreak = Math.max(game.bestStreak, game.streak);
+    } else {
+      game.streak = 0;
+    }
+
+    game.state = STATE.REPLAY;
+    game.replayT = 0;
+
+    if (outcome === 'SWISH' || outcome === 'GOAL') {
+      flashEl.classList.remove('go');
+      // force reflow to restart animation
+      void flashEl.offsetWidth;
+      flashEl.classList.add('go');
+      game.shake = outcome === 'SWISH' ? 18 : 10;
+      spawnConfetti(outcome === 'SWISH' ? 140 : 80);
+    } else {
+      game.shake = 3;
+    }
+  }
+
+  function nextEvent() {
+    if (game.sportIndex >= SPORTS.length - 1) {
+      game.state = STATE.FINAL;
+      game.t = 0;
+      spawnFireworks();
+      return;
+    }
+    game.sportIndex += 1;
+    startEventIntro();
+  }
+
+  // ---------- Particles ----------
+  function spawnConfetti(n) {
+    const palette = ['#ff3b5c', '#22d39a', '#3aa6ff', '#ffd24a', '#ff7a1a', '#ffffff'];
+    for (let i = 0; i < n; i++) {
+      game.confetti.push({
+        x: W/2 + rand(-200, 200),
+        y: rand(-60, 80),
+        vx: rand(-3, 3),
+        vy: rand(2, 7),
+        rot: rand(0, Math.PI*2),
+        vrot: rand(-0.2, 0.2),
+        size: rand(6, 14),
+        color: palette[Math.floor(Math.random() * palette.length)],
+        life: rand(180, 320),
+      });
+    }
+  }
+
+  function stepConfetti() {
+    for (let i = game.confetti.length - 1; i >= 0; i--) {
+      const c = game.confetti[i];
+      c.x += c.vx;
+      c.y += c.vy;
+      c.vy += 0.12;
+      c.rot += c.vrot;
+      c.life -= 1;
+      if (c.life <= 0 || c.y > H + 40) game.confetti.splice(i, 1);
+    }
+  }
+
+  function drawConfetti() {
+    for (const c of game.confetti) {
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate(c.rot);
+      ctx.fillStyle = c.color;
+      ctx.fillRect(-c.size/2, -c.size/4, c.size, c.size/2);
+      ctx.restore();
+    }
+  }
+
+  function spawnFireworks() {
+    game.fireworks = [];
+  }
+
+  function stepFireworks() {
+    if (Math.random() < 0.05) {
+      const cx = rand(W * 0.15, W * 0.85);
+      const cy = rand(H * 0.15, H * 0.5);
+      const color = `hsl(${Math.floor(rand(0, 360))}, 90%, 60%)`;
+      for (let i = 0; i < 40; i++) {
+        const a = (i / 40) * Math.PI * 2;
+        game.fireworks.push({
+          x: cx, y: cy,
+          vx: Math.cos(a) * rand(2, 6),
+          vy: Math.sin(a) * rand(2, 6),
+          life: rand(40, 80),
+          color,
+        });
+      }
+    }
+    for (let i = game.fireworks.length - 1; i >= 0; i--) {
+      const f = game.fireworks[i];
+      f.x += f.vx;
+      f.y += f.vy;
+      f.vy += 0.08;
+      f.vx *= 0.98;
+      f.life -= 1;
+      if (f.life <= 0) game.fireworks.splice(i, 1);
+    }
+  }
+
+  function drawFireworks() {
+    for (const f of game.fireworks) {
+      ctx.globalAlpha = clamp(f.life / 60, 0, 1);
+      ctx.fillStyle = f.color;
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ---------- Backgrounds ----------
+  function drawCrowd(baseY) {
+    const s = sport();
+    // backwall
+    gradientRect(0, 0, W, baseY, s.ambient, '#000', true);
+
+    // distant stand stripes
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    for (let i = 0; i < 6; i++) {
+      ctx.fillStyle = i % 2 ? '#1a2230' : '#0e1622';
+      ctx.fillRect(0, baseY - 60 - i * 22, W, 12);
+    }
+    ctx.restore();
+
+    // crowd dots
+    const seed = game.crowdSeed;
+    const flicker = Math.sin(game.t / 8) * 0.5 + 0.5;
+    for (let i = 0; i < seed.length; i++) {
+      const x = (seed[i] * W * 1.2) - 60;
+      const row = (i % 7);
+      const y = baseY - 100 + row * 8 + Math.sin(game.t / 30 + i) * 0.6;
+      const a = 0.4 + flicker * 0.4 * (i % 3 === 0 ? 1 : 0.4);
+      ctx.fillStyle = `rgba(255,255,255,${a * 0.18})`;
+      ctx.fillRect(x, y, 3, 5);
+      if (i % 17 === 0) {
+        ctx.fillStyle = `rgba(255,200,80,${a * 0.6})`;
+        ctx.fillRect(x, y, 3, 5);
+      }
+    }
+
+    // floodlight halos
+    const haloGrad = ctx.createRadialGradient(W*0.25, 60, 10, W*0.25, 60, 240);
+    haloGrad.addColorStop(0, 'rgba(255,255,255,0.25)');
+    haloGrad.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = haloGrad;
+    ctx.fillRect(0, 0, W, 220);
+    const haloGrad2 = ctx.createRadialGradient(W*0.75, 60, 10, W*0.75, 60, 240);
+    haloGrad2.addColorStop(0, 'rgba(255,255,255,0.25)');
+    haloGrad2.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = haloGrad2;
+    ctx.fillRect(0, 0, W, 220);
+  }
+
+  function drawBasketballCourt() {
+    const baseY = H * 0.62;
+    drawCrowd(baseY);
+
+    // court
+    gradientRect(0, baseY, W, H - baseY, '#a8702f', '#5a3a14', true);
+    // baseline lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(0, baseY + 4); ctx.lineTo(W, baseY + 4);
+    ctx.stroke();
+
+    // free throw / key (perspective trapezoid)
+    ctx.fillStyle = 'rgba(220,90,30,0.55)';
+    ctx.beginPath();
+    ctx.moveTo(W*0.40, baseY + 10);
+    ctx.lineTo(W*0.60, baseY + 10);
+    ctx.lineTo(W*0.72, H);
+    ctx.lineTo(W*0.28, H);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // three-point arc (ellipse for perspective)
+    ctx.beginPath();
+    ctx.ellipse(W/2, baseY + 8, W * 0.36, 100, 0, Math.PI, Math.PI * 2);
+    ctx.stroke();
+
+    // hoop / backboard
+    const hx = W/2, hy = baseY - 130;
+    // backboard
+    ctx.fillStyle = '#f0eee8';
+    ctx.fillRect(hx - 90, hy - 70, 180, 100);
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(hx - 90, hy - 70, 180, 100);
+    // inner square
+    ctx.strokeStyle = '#e23';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(hx - 36, hy - 30, 72, 50);
+    // pole
+    ctx.fillStyle = '#222';
+    ctx.fillRect(hx - 6, hy + 30, 12, 90);
+    // rim
+    ctx.fillStyle = '#ff3a1a';
+    ctx.beginPath();
+    ctx.ellipse(hx, hy + 30, 50, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#a82010';
+    ctx.beginPath();
+    ctx.ellipse(hx, hy + 32, 50, 8, 0, 0, Math.PI);
+    ctx.fill();
+    // net
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 7; i++) {
+      const fx = hx - 40 + (i / 6) * 80;
+      ctx.beginPath();
+      ctx.moveTo(fx, hy + 30);
+      ctx.lineTo(hx - 30 + (i / 6) * 60, hy + 75);
+      ctx.stroke();
+    }
+    for (let i = 0; i < 3; i++) {
+      const y = hy + 40 + i * 12;
+      ctx.beginPath();
+      ctx.ellipse(hx, y, 46 - i * 5, 7 - i * 1.2, 0, 0, Math.PI);
+      ctx.stroke();
+    }
+  }
+
+  function drawSoccerField() {
+    const baseY = H * 0.50;
+    drawCrowd(baseY);
+    // grass with stripes
+    for (let i = 0; i < 12; i++) {
+      const y = baseY + (i * (H - baseY) / 12);
+      const h = (H - baseY) / 12 + 2;
+      ctx.fillStyle = i % 2 ? '#2c8a3a' : '#256e2f';
+      ctx.fillRect(0, y, W, h);
+    }
+    // 18-yard arc
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.ellipse(W/2, baseY + 110, W * 0.45, 80, 0, Math.PI, Math.PI * 2);
+    ctx.stroke();
+    // penalty spot
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(W/2, H - 90, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // goal
+    const gx = W/2, gy = baseY + 30;
+    const gw = 540, gh = 180;
+    // posts (perspective)
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(gx - gw/2 - 8, gy - gh, 8, gh + 4);
+    ctx.fillRect(gx + gw/2, gy - gh, 8, gh + 4);
+    ctx.fillRect(gx - gw/2 - 12, gy - gh - 6, gw + 24, 8);
+    // net (mesh)
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 16; i++) {
+      const x = gx - gw/2 + (i/16) * gw;
+      ctx.beginPath();
+      ctx.moveTo(x, gy - gh);
+      ctx.lineTo(gx - gw/2 + (i/16) * (gw * 0.85) + (gw * 0.075), gy);
+      ctx.stroke();
+    }
+    for (let i = 0; i <= 8; i++) {
+      const y = gy - gh + (i/8) * gh;
+      const px = (i/8) * (gw * 0.075);
+      ctx.beginPath();
+      ctx.moveTo(gx - gw/2 + px, y);
+      ctx.lineTo(gx + gw/2 - px, y);
+      ctx.stroke();
+    }
+
+    // keeper
+    const kx = gx + Math.sin(game.t / 20) * 80;
+    const ky = gy - 20;
+    drawKeeper(kx, ky);
+  }
+
+  function drawKeeper(x, y) {
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath();
+    ctx.ellipse(x, y + 60, 30, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // body
+    ctx.fillStyle = '#fcd34d';
+    ctx.fillRect(x - 16, y, 32, 56);
+    // head
+    ctx.fillStyle = '#e2b48a';
+    ctx.beginPath();
+    ctx.arc(x, y - 8, 10, 0, Math.PI * 2);
+    ctx.fill();
+    // gloves
+    ctx.fillStyle = '#222';
+    ctx.beginPath();
+    ctx.arc(x - 24, y + 20, 8, 0, Math.PI * 2);
+    ctx.arc(x + 24, y + 20, 8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawFootballField() {
+    const baseY = H * 0.46;
+    drawCrowd(baseY);
+    // turf
+    for (let i = 0; i < 10; i++) {
+      const y = baseY + i * (H - baseY) / 10;
+      const h = (H - baseY) / 10 + 2;
+      ctx.fillStyle = i % 2 ? '#1f6a32' : '#185628';
+      ctx.fillRect(0, y, W, h);
+    }
+    // yard lines (perspective)
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 3;
+    for (let i = 1; i < 5; i++) {
+      const t = i / 5;
+      const y = baseY + t * (H - baseY);
+      const margin = (1 - t) * (W * 0.2);
+      ctx.beginPath();
+      ctx.moveTo(margin, y);
+      ctx.lineTo(W - margin, y);
+      ctx.stroke();
+      ctx.font = `${20 + t * 30}px Inter`;
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${(5 - i) * 10}`, W * 0.18 + margin * 0.3, y - 8);
+      ctx.fillText(`${(5 - i) * 10}`, W * 0.82 - margin * 0.3, y - 8);
+    }
+    // goalposts
+    const gpx = W/2, gpy = baseY - 10;
+    ctx.fillStyle = '#ffd24a';
+    ctx.fillRect(gpx - 4, gpy - 30, 8, 30);
+    ctx.fillRect(gpx - 4, gpy - 220, 8, 30);
+    ctx.fillRect(gpx - 140, gpy - 220, 280, 8);
+    ctx.fillRect(gpx - 140, gpy - 220, 8, 130);
+    ctx.fillRect(gpx + 132, gpy - 220, 8, 130);
+    // net behind
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 12; i++) {
+      const x = gpx - 130 + i * 22;
+      ctx.beginPath();
+      ctx.moveTo(x, gpy - 220);
+      ctx.lineTo(x, gpy - 90);
+      ctx.stroke();
+    }
+
+    // wind indicator
+    drawWindFlag(W * 0.85, baseY + 40);
+  }
+
+  function drawWindFlag(x, y) {
+    ctx.save();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y + 60);
+    ctx.stroke();
+    const wind = game.wind;
+    ctx.fillStyle = wind > 0 ? '#22d39a' : '#ff3b5c';
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + wind * 50, y + 12);
+    ctx.lineTo(x, y + 24);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawHockeyRink() {
+    const baseY = H * 0.46;
+    drawCrowd(baseY);
+    // ice
+    gradientRect(0, baseY, W, H - baseY, '#e8f1ff', '#a9bcd6', true);
+    // red center / blue line strokes
+    ctx.strokeStyle = '#1a5fb4';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(0, H - 120);
+    ctx.lineTo(W, H - 120);
+    ctx.stroke();
+    // crease
+    ctx.fillStyle = 'rgba(94,153,219,0.45)';
+    ctx.beginPath();
+    ctx.ellipse(W/2, baseY + 70, 110, 50, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#e3243b';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.ellipse(W/2, baseY + 70, 110, 50, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // goal
+    const gx = W/2, gy = baseY + 50;
+    const gw = 240, gh = 110;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(gx - gw/2 - 6, gy - gh, 6, gh);
+    ctx.fillRect(gx + gw/2, gy - gh, 6, gh);
+    ctx.fillRect(gx - gw/2 - 6, gy - gh - 6, gw + 12, 6);
+    // net mesh
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillRect(gx - gw/2, gy - gh, gw, gh);
+    ctx.strokeStyle = 'rgba(200,210,230,0.9)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 12; i++) {
+      const x = gx - gw/2 + (i / 12) * gw;
+      ctx.beginPath();
+      ctx.moveTo(x, gy - gh);
+      ctx.lineTo(x, gy);
+      ctx.stroke();
+    }
+    for (let i = 0; i <= 6; i++) {
+      const y = gy - gh + (i / 6) * gh;
+      ctx.beginPath();
+      ctx.moveTo(gx - gw/2, y);
+      ctx.lineTo(gx + gw/2, y);
+      ctx.stroke();
+    }
+
+    // goalie
+    drawGoalie(gx + Math.sin(game.t / 18) * 40, gy - 30);
+  }
+
+  function drawGoalie(x, y) {
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath();
+    ctx.ellipse(x, y + 60, 36, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // pads
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x - 28, y + 10, 56, 50);
+    ctx.fillStyle = '#e3243b';
+    ctx.fillRect(x - 28, y + 10, 56, 8);
+    // chest
+    ctx.fillStyle = '#0a1a2e';
+    ctx.fillRect(x - 22, y - 14, 44, 32);
+    // mask
+    ctx.fillStyle = '#222';
+    ctx.beginPath();
+    ctx.arc(x, y - 20, 12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#888';
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(x - 10 + i * 6, y - 26);
+      ctx.lineTo(x - 10 + i * 6, y - 14);
+      ctx.stroke();
+    }
+  }
+
+  function drawBaseballField() {
+    const baseY = H * 0.42;
+    drawCrowd(baseY);
+    // outfield wall
+    ctx.fillStyle = '#1a5a2a';
+    ctx.fillRect(0, baseY, W, 70);
+    // green monster effect
+    gradientRect(0, baseY + 70, W, H - baseY - 70, '#4a8b3a', '#7a4a1e', true);
+    // dirt arc (infield)
+    ctx.fillStyle = '#a05a2c';
+    ctx.beginPath();
+    ctx.ellipse(W/2, H + 80, W * 0.7, 240, 0, Math.PI, Math.PI * 2);
+    ctx.fill();
+    // home plate
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.moveTo(W/2, H - 40);
+    ctx.lineTo(W/2 - 30, H - 60);
+    ctx.lineTo(W/2 - 30, H - 75);
+    ctx.lineTo(W/2 + 30, H - 75);
+    ctx.lineTo(W/2 + 30, H - 60);
+    ctx.closePath();
+    ctx.fill();
+    // pitcher's mound
+    ctx.fillStyle = '#8c4a20';
+    ctx.beginPath();
+    ctx.ellipse(W/2, baseY + 200, 80, 22, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // foul lines
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(W/2 - 30, H - 70);
+    ctx.lineTo(0, baseY + 60);
+    ctx.moveTo(W/2 + 30, H - 70);
+    ctx.lineTo(W, baseY + 60);
+    ctx.stroke();
+    // scoreboard on the wall
+    drawJumbotron(W * 0.7, baseY - 20, 200, 80);
+  }
+
+  function drawJumbotron(x, y, w, h) {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(x, y, w, h);
+    ctx.strokeStyle = '#333';
+    ctx.strokeRect(x, y, w, h);
+    ctx.fillStyle = '#ff3a1a';
+    ctx.font = 'bold 14px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText('MELTING POD', x + w/2, y + 22);
+    ctx.fillStyle = '#ffd24a';
+    ctx.font = 'bold 26px monospace';
+    ctx.fillText(`POD ${game.score}`, x + w/2, y + 55);
+  }
+
+  // ---------- Player Avatar ----------
+  function drawPlayer(x, y, sportKey, t) {
+    const s = sport();
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.beginPath();
+    ctx.ellipse(x, y + 70, 32, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    const wind = t; // animation phase
+
+    // legs
+    ctx.fillStyle = s.home.secondary;
+    ctx.fillRect(x - 16, y + 22, 12, 44);
+    ctx.fillRect(x + 4, y + 22, 12, 44);
+
+    // jersey
+    ctx.fillStyle = s.home.primary;
+    ctx.fillRect(x - 22, y - 10, 44, 36);
+    ctx.fillStyle = s.home.secondary;
+    ctx.fillRect(x - 22, y - 10, 44, 6);
+    // number
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 16px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText('07', x, y + 14);
+
+    // arms
+    ctx.fillStyle = s.home.primary;
+    if (sportKey === 'basketball') {
+      ctx.fillRect(x - 30, y - 6, 8, 30);
+      ctx.fillRect(x + 22, y - 16 - Math.sin(wind) * 8, 8, 30);
+    } else if (sportKey === 'soccer') {
+      ctx.fillRect(x - 30, y - 6, 8, 28);
+      ctx.fillRect(x + 22, y - 6, 8, 28);
+    } else if (sportKey === 'football') {
+      ctx.fillRect(x - 30, y - 6, 8, 28);
+      ctx.fillRect(x + 22, y - 6 + Math.cos(wind) * 6, 8, 28);
+    } else if (sportKey === 'hockey') {
+      ctx.fillRect(x - 30, y - 6, 8, 28);
+      ctx.fillRect(x + 22, y - 6, 8, 28);
+      // stick
+      ctx.strokeStyle = '#8a5a2c';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(x + 24, y + 4);
+      ctx.lineTo(x + 90, y + 50);
+      ctx.stroke();
+      ctx.strokeStyle = '#222';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.moveTo(x + 80, y + 48);
+      ctx.lineTo(x + 110, y + 56);
+      ctx.stroke();
+    } else if (sportKey === 'baseball') {
+      ctx.fillRect(x - 30 + Math.sin(wind) * 4, y - 6, 8, 28);
+      ctx.fillRect(x + 22, y - 6, 8, 28);
+      // bat
+      ctx.strokeStyle = '#8a5a2c';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.moveTo(x - 30, y - 6);
+      ctx.lineTo(x - 50 - Math.sin(wind) * 8, y - 56 - Math.cos(wind) * 8);
+      ctx.stroke();
+    }
+
+    // head
+    ctx.fillStyle = '#d8a87b';
+    ctx.beginPath();
+    ctx.arc(x, y - 22, 12, 0, Math.PI * 2);
+    ctx.fill();
+    // helmet / hair
+    ctx.fillStyle = s.home.secondary;
+    ctx.beginPath();
+    ctx.arc(x, y - 24, 13, Math.PI, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // ---------- HUD ----------
+  function drawScoreboard() {
+    const s = sport();
+    // top bar
+    ctx.save();
+    ctx.fillStyle = 'rgba(7,10,20,0.92)';
+    ctx.fillRect(0, 0, W, 60);
+    // accent stripe
+    gradientRect(0, 60, W, 4, '#ff7a1a', '#ffd24a', false);
+
+    // brand block
+    gradientRect(0, 0, 220, 60, '#ff7a1a', '#d64513', false);
+    shadowText('POD', 30, 30, 30, '#fff', 900, 'left', false);
+    shadowText('SPORTS', 100, 30, 22, '#0a0e1a', 800, 'left', false);
+
+    // event title
+    shadowText(s.label.toUpperCase(), 245, 22, 14, '#9fb3d9', 700, 'left', false);
+    shadowText(`${s.city.toUpperCase()} · ${s.arena.toUpperCase()}`, 245, 42, 11, '#5a6b85', 700, 'left', false);
+
+    // score chip
+    const sx = W - 360;
+    roundRect(ctx, sx, 12, 340, 36, 8);
+    ctx.fillStyle = '#0e1626';
+    ctx.fill();
+    ctx.strokeStyle = '#1f2a44';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // home team color box
+    ctx.fillStyle = s.home.primary;
+    ctx.fillRect(sx + 10, 18, 24, 24);
+    shadowText(s.home.name, sx + 44, 30, 13, '#fff', 800, 'left', false);
+    shadowText(String(game.score), W - 30, 30, 22, '#ffd24a', 900, 'right', false);
+
+    // streak
+    if (game.streak > 1) {
+      const sx2 = W - 480;
+      roundRect(ctx, sx2, 16, 110, 28, 14);
+      ctx.fillStyle = '#ff3b5c';
+      ctx.fill();
+      shadowText(`x${game.streak} STREAK`, sx2 + 55, 30, 12, '#fff', 800, 'center', false);
+    }
+
+    // event progress dots
+    for (let i = 0; i < SPORTS.length; i++) {
+      const dx = 600 + i * 22;
+      ctx.beginPath();
+      ctx.arc(dx, 30, 7, 0, Math.PI * 2);
+      if (i < game.sportIndex) {
+        ctx.fillStyle = game.scoresPerSport[i] > 0 ? '#22d39a' : '#ff3b5c';
+      } else if (i === game.sportIndex) {
+        ctx.fillStyle = '#ffd24a';
+      } else {
+        ctx.fillStyle = '#1f2a44';
+      }
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // Power & accuracy meters
+  function drawMeters() {
+    const baseY = H - 90;
+
+    // POWER bar (vertical-style stripe with sweet zone)
+    const pw = 360, ph = 22;
+    const px = W/2 - pw/2;
+    const py = baseY;
+    // backing
+    roundRect(ctx, px - 4, py - 4, pw + 8, ph + 8, 6);
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fill();
+    // base gradient
+    const g = ctx.createLinearGradient(px, 0, px + pw, 0);
+    g.addColorStop(0, '#22d39a');
+    g.addColorStop(0.5, '#ffd24a');
+    g.addColorStop(0.82, '#ff3b5c');
+    g.addColorStop(1, '#ff3b5c');
+    ctx.fillStyle = g;
+    ctx.fillRect(px, py, pw, ph);
+    // sweet zone (around 0.85)
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.fillRect(px + pw * 0.78, py, pw * 0.12, ph);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(px + pw * 0.78, py - 1, pw * 0.12, ph + 2);
+    // current marker
+    const pVal = game.locked.power ?? game.power;
+    const markerX = px + pw * pVal;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(markerX - 2, py - 6, 4, ph + 12);
+
+    // label
+    shadowText('POWER', px - 60, py + 11, 12, '#9fb3d9', 800, 'right', false);
+
+    // ACCURACY bar
+    const aw = 480, ah = 18;
+    const ax = W/2 - aw/2;
+    const ay = baseY + 40;
+    roundRect(ctx, ax - 4, ay - 4, aw + 8, ah + 8, 6);
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fill();
+    // segments
+    const segs = [
+      [0, 0.18, '#ff3b5c'],
+      [0.18, 0.36, '#ffd24a'],
+      [0.36, 0.5, '#22d39a'],
+      [0.5, 0.64, '#22d39a'],
+      [0.64, 0.82, '#ffd24a'],
+      [0.82, 1, '#ff3b5c'],
+    ];
+    for (const [s, e, c] of segs) {
+      ctx.fillStyle = c;
+      ctx.fillRect(ax + aw * s, ay, aw * (e - s), ah);
+    }
+    // center mark
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(ax + aw / 2 - 1, ay - 4, 2, ah + 8);
+    // moving needle
+    const aVal = game.locked.accuracy ?? game.aim;
+    const needleX = ax + aw / 2 + (aVal * aw / 2);
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.moveTo(needleX, ay - 8);
+    ctx.lineTo(needleX - 6, ay - 16);
+    ctx.lineTo(needleX + 6, ay - 16);
+    ctx.closePath();
+    ctx.fill();
+    shadowText('AIM', ax - 60, ay + 9, 12, '#9fb3d9', 800, 'right', false);
+
+    // instructions
+    let prompt = '';
+    if (game.state === STATE.READY) prompt = 'PRESS SPACE TO START POWER';
+    else if (game.state === STATE.POWER) prompt = 'PRESS SPACE TO LOCK POWER';
+    else if (game.state === STATE.ACCURACY) prompt = 'PRESS SPACE TO LOCK AIM';
+    if (prompt) {
+      const blink = (Math.floor(game.t / 20) % 2 === 0);
+      shadowText(prompt, W/2, baseY + 88, 14, blink ? '#fff' : '#9fb3d9', 800, 'center', false);
+    }
+  }
+
+  // ---------- Screens ----------
+  function drawIntro() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+
+    // stars
+    for (let i = 0; i < game.starSeed.length; i++) {
+      const x = game.starSeed[i] * W;
+      const y = (game.starSeed[(i+11) % game.starSeed.length]) * H;
+      const a = 0.4 + 0.6 * Math.sin(game.t / 30 + i);
+      ctx.fillStyle = `rgba(255,255,255,${a * 0.4})`;
+      ctx.fillRect(x, y, 2, 2);
+    }
+
+    // glow
+    const grad = ctx.createRadialGradient(W/2, H/2, 50, W/2, H/2, 800);
+    grad.addColorStop(0, 'rgba(255,122,26,0.55)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    const inT = clamp(game.t / 30, 0, 1);
+    const scale = lerp(1.4, 1, easeOut(inT));
+    ctx.save();
+    ctx.translate(W/2, H/2 - 60);
+    ctx.scale(scale, scale);
+    // POD SPORTS lockup
+    gradientRect(-220, -56, 440, 112, '#ff7a1a', '#d64513', true);
+    ctx.strokeStyle = '#ffd24a';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(-220, -56, 440, 112);
+    shadowText('POD', -110, 0, 64, '#fff', 900, 'center', false);
+    shadowText('SPORTS', 80, 0, 44, '#0a0e1a', 900, 'center', false);
+    ctx.restore();
+
+    shadowText('ALL-STAR SHOWDOWN', W/2, H/2 + 50, 32, '#ffd24a', 800);
+    shadowText('CROSS-SPORT CHAMPIONSHIP', W/2, H/2 + 90, 18, '#9fb3d9', 700);
+
+    // event list
+    const lx = W/2 - 360, ly = H/2 + 140;
+    ctx.font = 'bold 13px Inter';
+    ctx.textAlign = 'center';
+    for (let i = 0; i < SPORTS.length; i++) {
+      const x = lx + i * 180;
+      roundRect(ctx, x, ly, 160, 40, 8);
+      ctx.fillStyle = SPORTS[i].home.primary;
+      ctx.fill();
+      ctx.fillStyle = '#0a0e1a';
+      ctx.fillText(SPORTS[i].label.toUpperCase(), x + 80, ly + 25);
+    }
+
+    // press to start
+    if (Math.floor(game.t / 30) % 2 === 0) {
+      shadowText('PRESS SPACE OR CLICK TO BEGIN', W/2, H - 100, 22, '#fff', 900);
+    }
+    // signature
+    shadowText('"IT\'S IN THE PODCAST"', W/2, H - 60, 14, '#5a6b85', 700);
+  }
+
+  function drawEventIntro() {
+    // draw the actual scene behind
+    drawScene(false);
+
+    // dim
+    const dim = clamp(1 - game.t / 90, 0, 1);
+    ctx.fillStyle = `rgba(0,0,0,${0.55 * dim + 0.2})`;
+    ctx.fillRect(0, 0, W, H);
+
+    const s = sport();
+    const slideIn = easeOut(clamp(game.t / 24, 0, 1));
+    const yOff = lerp(80, 0, slideIn);
+
+    // big sport title card
+    const cardY = H/2 - 120 + yOff;
+    gradientRect(0, cardY, W, 200, s.home.primary, s.home.secondary, false);
+    // accent stripes
+    ctx.fillStyle = '#0a0e1a';
+    ctx.fillRect(0, cardY + 200, W, 6);
+    ctx.fillStyle = '#ffd24a';
+    ctx.fillRect(0, cardY - 6, W, 6);
+
+    shadowText(`EVENT ${game.sportIndex + 1} OF ${SPORTS.length}`, W/2, cardY + 36, 16, 'rgba(255,255,255,0.8)', 800);
+    shadowText(s.label.toUpperCase(), W/2, cardY + 84, 64, '#fff', 900);
+    shadowText(`${s.city.toUpperCase()} · ${s.arena.toUpperCase()}`, W/2, cardY + 144, 20, '#0a0e1a', 800);
+
+    // player card
+    const px = W/2 - 240, py = cardY + 220;
+    if (game.t > 24) {
+      const pT = easeOut(clamp((game.t - 24) / 24, 0, 1));
+      ctx.globalAlpha = pT;
+      gradientRect(px, py, 480, 80, '#0e1626', '#1a2238', false);
+      ctx.strokeStyle = '#ffd24a';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(px, py, 480, 80);
+      // OVR badge
+      ctx.fillStyle = '#ffd24a';
+      ctx.fillRect(px + 12, py + 12, 56, 56);
+      shadowText(String(game.playerOVR), px + 40, py + 36, 24, '#0a0e1a', 900);
+      shadowText('OVR', px + 40, py + 58, 11, '#0a0e1a', 800);
+      shadowText(game.playerName, px + 88, py + 32, 22, '#fff', 900, 'left');
+      shadowText(s.home.name + ' · #07', px + 88, py + 58, 13, '#9fb3d9', 700, 'left');
+      ctx.globalAlpha = 1;
+    }
+
+    if (game.t > 60 && Math.floor(game.t / 24) % 2 === 0) {
+      shadowText('PRESS SPACE', W/2, H - 70, 18, '#fff', 800);
+    }
+  }
+
+  function drawScene(showActors = true) {
+    const s = sport();
+    if (s.key === 'basketball') drawBasketballCourt();
+    else if (s.key === 'soccer') drawSoccerField();
+    else if (s.key === 'football') drawFootballField();
+    else if (s.key === 'hockey') drawHockeyRink();
+    else if (s.key === 'baseball') drawBaseballField();
+
+    if (showActors) {
+      const baseY = (
+        s.key === 'basketball' ? H * 0.62 :
+        s.key === 'soccer'     ? H * 0.50 :
+        s.key === 'football'   ? H * 0.46 :
+        s.key === 'hockey'     ? H * 0.46 :
+                                  H * 0.42
+      );
+      const playerX = W/2 - (s.key === 'baseball' ? 40 : 0);
+      const playerY = (
+        s.key === 'basketball' ? H - 140 :
+        s.key === 'soccer'     ? H - 130 :
+        s.key === 'football'   ? H - 130 :
+        s.key === 'hockey'     ? H - 130 :
+                                  H - 130
+      );
+      drawPlayer(playerX, playerY, s.key, game.t / 8);
+
+      // ball at feet (when ready)
+      drawBallAtRest(s.key);
+    }
+  }
+
+  function drawBallAtRest(key) {
+    const s = sport();
+    let bx, by, r;
+    if (key === 'basketball') { bx = W/2 + 22; by = H - 90; r = 14; }
+    else if (key === 'soccer') { bx = W/2; by = H - 90; r = 14; }
+    else if (key === 'football') { bx = W/2 + 18; by = H - 90; r = 13; }
+    else if (key === 'hockey') { bx = W/2 + 110; by = H - 80; r = 8; }
+    else if (key === 'baseball') { bx = W/2 + 60; by = H - 110; r = 9; }
+
+    if (key === 'football') {
+      // ellipse
+      ctx.save();
+      ctx.translate(bx, by);
+      ctx.rotate(-0.3);
+      ctx.fillStyle = s.ball;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, r * 1.5, r, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-6, 0); ctx.lineTo(6, 0);
+      ctx.stroke();
+      for (let i = 0; i < 4; i++) {
+        ctx.beginPath();
+        ctx.moveTo(-3 + i * 2, -2);
+        ctx.lineTo(-3 + i * 2, 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+      return;
+    }
+    if (key === 'hockey') {
+      ctx.fillStyle = '#0a0a0a';
+      ctx.beginPath();
+      ctx.ellipse(bx, by, r, r * 0.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      return;
+    }
+    ctx.fillStyle = s.ball;
+    ctx.beginPath();
+    ctx.arc(bx, by, r, 0, Math.PI * 2);
+    ctx.fill();
+    if (key === 'basketball') {
+      ctx.strokeStyle = '#3a1a0a';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(bx - r, by); ctx.lineTo(bx + r, by);
+      ctx.moveTo(bx, by - r); ctx.lineTo(bx, by + r);
+      ctx.stroke();
+    } else if (key === 'soccer') {
+      ctx.fillStyle = '#0a0a0a';
+      const pts = [[0,-6],[5,-2],[-5,-2],[3,5],[-3,5]];
+      for (const [dx, dy] of pts) {
+        ctx.beginPath();
+        ctx.arc(bx + dx, by + dy, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (key === 'baseball') {
+      ctx.strokeStyle = '#d11242';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.arc(bx, by, r - 3, -0.4, 0.4);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(bx, by, r - 3, Math.PI - 0.4, Math.PI + 0.4);
+      ctx.stroke();
+    }
+  }
+
+  function drawReplay() {
+    drawScene(false);
+    // animate ball trajectory based on shotResult
+    const t = clamp(game.replayT / 60, 0, 1);
+    const s = sport();
+    const r = game.shotResult;
+
+    // start point
+    let sx = W/2, sy = H - 100;
+    let tx = W/2, ty = H/2;
+
+    if (s.key === 'basketball') { sx = W/2 + 22; sy = H - 90; tx = W/2; ty = H * 0.62 - 100; }
+    else if (s.key === 'soccer') { sx = W/2; sy = H - 90; tx = W/2; ty = H * 0.50 + 30; }
+    else if (s.key === 'football') { sx = W/2 + 18; sy = H - 90; tx = W/2; ty = H * 0.46 - 100; }
+    else if (s.key === 'hockey') { sx = W/2 + 110; sy = H - 80; tx = W/2; ty = H * 0.46 + 70; }
+    else if (s.key === 'baseball') { sx = W/2 + 60; sy = H - 110; tx = W/2; ty = H * 0.42 - 20; }
+
+    // offset by aim error and outcome
+    const aimErr = game.locked.accuracy ?? 0;
+    const off = aimErr * 220;
+    const outcomeOff = r.outcome === 'MISS' ? Math.sign(aimErr || 1) * 80 : 0;
+    tx += off + outcomeOff;
+
+    // wind for football
+    if (s.key === 'football') tx += game.wind * 60;
+
+    // path with arc
+    const arc = -200 - (s.key === 'football' || s.key === 'baseball' ? 200 : 0);
+    const bx = lerp(sx, tx, t);
+    const by = lerp(sy, ty, t) + arc * (4 * t * (1 - t)) * -0.5;
+
+    // trail
+    ctx.strokeStyle = `rgba(255,210,74,${1 - t * 0.4})`;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    for (let k = 0; k < 12; k++) {
+      const tk = clamp(t - k * 0.02, 0, 1);
+      const x = lerp(sx, tx, tk);
+      const y = lerp(sy, ty, tk) + arc * (4 * tk * (1 - tk)) * -0.5;
+      if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // ball
+    if (s.key === 'football') {
+      ctx.save();
+      ctx.translate(bx, by);
+      ctx.rotate(game.replayT * 0.5);
+      ctx.fillStyle = s.ball;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 18, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-6, 0); ctx.lineTo(6, 0);
+      ctx.stroke();
+      ctx.restore();
+    } else if (s.key === 'hockey') {
+      ctx.fillStyle = '#0a0a0a';
+      ctx.beginPath();
+      ctx.ellipse(bx, by, 10, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.fillStyle = s.ball;
+      ctx.beginPath();
+      ctx.arc(bx, by, s.key === 'baseball' ? 8 : 14, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // result card after the ball lands
+    if (t > 0.9) {
+      const cT = easeOut(clamp((t - 0.9) / 0.1, 0, 1));
+      ctx.globalAlpha = cT;
+      const cardW = 720, cardH = 140;
+      const cx = W/2 - cardW/2;
+      const cy = H/2 - cardH/2 - 40;
+      gradientRect(cx, cy, cardW, cardH, '#0e1626', '#1a2238', false);
+      ctx.strokeStyle = r.points > 0 ? '#22d39a' : '#ff3b5c';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(cx, cy, cardW, cardH);
+      shadowText(r.label, W/2, cy + 50, 44, r.points > 0 ? '#ffd24a' : '#ff3b5c', 900);
+      shadowText(r.commentary, W/2, cy + 96, 18, '#9fb3d9', 700);
+      shadowText(`+${r.points}`, W/2, cy + cardH - 18, 16, '#22d39a', 800);
+      ctx.globalAlpha = 1;
+    }
+
+    drawConfetti();
+
+    if (t > 0.98 && Math.floor(game.t / 24) % 2 === 0) {
+      shadowText('PRESS SPACE TO CONTINUE', W/2, H - 70, 16, '#fff', 800);
+    }
+  }
+
+  function drawFinal() {
+    // backdrop
+    ctx.fillStyle = '#050810';
+    ctx.fillRect(0, 0, W, H);
+    drawFireworks();
+
+    const grad = ctx.createRadialGradient(W/2, H/2, 100, W/2, H/2, 700);
+    grad.addColorStop(0, 'rgba(255,210,74,0.25)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // trophy
+    ctx.save();
+    ctx.translate(W/2, 220);
+    const bob = Math.sin(game.t / 18) * 6;
+    ctx.translate(0, bob);
+    // cup
+    ctx.fillStyle = '#ffd24a';
+    ctx.beginPath();
+    ctx.moveTo(-60, -60); ctx.lineTo(60, -60);
+    ctx.lineTo(50, 20); ctx.lineTo(-50, 20); ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#c8941c';
+    ctx.fillRect(-30, 20, 60, 18);
+    ctx.fillRect(-50, 38, 100, 14);
+    // handles
+    ctx.strokeStyle = '#ffd24a';
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.arc(-72, -32, 22, -0.5, 2.3);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(72, -32, 22, Math.PI - 2.3, Math.PI + 0.5);
+    ctx.stroke();
+    // shine
+    ctx.fillStyle = '#fff8d0';
+    ctx.fillRect(-44, -52, 6, 60);
+    ctx.restore();
+
+    shadowText('CHAMPIONSHIP COMPLETE', W/2, 330, 26, '#9fb3d9', 800);
+    shadowText('FINAL SCORE', W/2, 380, 16, '#5a6b85', 700);
+    shadowText(String(game.score), W/2, 450, 96, '#ffd24a', 900);
+
+    // grade
+    let grade = 'C', gradeColor = '#9fb3d9', tagline = 'Try again, champ.';
+    if (game.score >= 130) { grade = 'S'; gradeColor = '#ffd24a'; tagline = 'GOAT TIER. The trophy goes home with you.'; }
+    else if (game.score >= 100) { grade = 'A'; gradeColor = '#22d39a'; tagline = 'All-Star performance.'; }
+    else if (game.score >= 70) { grade = 'B'; gradeColor = '#3aa6ff'; tagline = 'Solid showing.'; }
+    else if (game.score >= 40) { grade = 'C'; gradeColor = '#ffd24a'; tagline = 'Decent. Room to grow.'; }
+    else { grade = 'D'; gradeColor = '#ff3b5c'; tagline = 'Rough night. Hit the practice tape.'; }
+    shadowText(`GRADE: ${grade}`, W/2, 510, 28, gradeColor, 900);
+    shadowText(tagline, W/2, 548, 16, '#9fb3d9', 700);
+    shadowText(`Best streak: ${game.bestStreak}`, W/2, 578, 14, '#5a6b85', 700);
+
+    // breakdown
+    const bx = W/2 - 400;
+    for (let i = 0; i < SPORTS.length; i++) {
+      const cx = bx + i * 160;
+      const cy = 610;
+      roundRect(ctx, cx, cy, 150, 60, 8);
+      ctx.fillStyle = '#0e1626';
+      ctx.fill();
+      ctx.strokeStyle = SPORTS[i].home.primary;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(cx, cy, 150, 60);
+      shadowText(SPORTS[i].label.toUpperCase().slice(0, 14), cx + 75, cy + 20, 10, '#9fb3d9', 700);
+      const sc = game.scoresPerSport[i] ?? 0;
+      shadowText(`+${sc}`, cx + 75, cy + 42, 18, sc > 0 ? '#22d39a' : '#ff3b5c', 900);
+    }
+
+    if (Math.floor(game.t / 30) % 2 === 0) {
+      shadowText('PRESS R TO PLAY AGAIN', W/2, H - 30, 16, '#fff', 800);
+    }
+  }
+
+  // ---------- Update ----------
+  function update() {
+    game.t += 1;
+
+    if (game.shake > 0) game.shake *= 0.85;
+
+    if (game.state === STATE.BOOT) {
+      if (spaceEdge) restart();
+    } else if (game.state === STATE.INTRO) {
+      if (spaceEdge && game.t > 30) startEventIntro();
+    } else if (game.state === STATE.EVENT_INTRO) {
+      if (spaceEdge && game.t > 30) startReady();
+    } else if (game.state === STATE.READY) {
+      if (spaceEdge) {
+        game.state = STATE.POWER;
+        game.t = 0;
+      }
+    } else if (game.state === STATE.POWER) {
+      game.power += game.powerDir * game.powerSpeed;
+      if (game.power >= 1) { game.power = 1; game.powerDir = -1; }
+      if (game.power <= 0) { game.power = 0; game.powerDir = 1; }
+      if (spaceEdge) {
+        game.locked.power = game.power;
+        game.state = STATE.ACCURACY;
+        game.t = 0;
+      }
+    } else if (game.state === STATE.ACCURACY) {
+      game.aim += game.aimDir * game.aimSpeed;
+      if (game.aim >= 1) { game.aim = 1; game.aimDir = -1; }
+      if (game.aim <= -1) { game.aim = -1; game.aimDir = 1; }
+      if (spaceEdge) {
+        game.locked.accuracy = game.aim;
+        takeShot();
+      }
+    } else if (game.state === STATE.REPLAY) {
+      game.replayT += 1;
+      if (game.replayT > 80 && spaceEdge) {
+        nextEvent();
+      }
+    } else if (game.state === STATE.FINAL) {
+      stepFireworks();
+    }
+
+    stepConfetti();
+    spaceEdge = false;
+  }
+
+  // ---------- Render ----------
+  function render() {
+    ctx.save();
+    if (game.shake > 0.1) {
+      ctx.translate(rand(-game.shake, game.shake), rand(-game.shake, game.shake));
+    }
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+
+    if (game.state === STATE.BOOT || game.state === STATE.INTRO) {
+      drawIntro();
+    } else if (game.state === STATE.EVENT_INTRO) {
+      drawEventIntro();
+    } else if (game.state === STATE.READY || game.state === STATE.POWER || game.state === STATE.ACCURACY) {
+      drawScene(true);
+      drawConfetti();
+      drawScoreboard();
+      drawMeters();
+
+      // event prompt overlay
+      if (game.state === STATE.READY && Math.floor(game.t / 24) % 2 === 0) {
+        const s = sport();
+        const promptText = {
+          basketball: 'STEP UP TO THE ARC',
+          soccer:     'STEP UP FOR THE PENALTY',
+          football:   '52 YARDS — SNAP IS GOOD',
+          hockey:     'BREAKAWAY — ONE-ON-ONE',
+          baseball:   'BOTTOM OF THE 9TH — SWING FOR IT',
+        }[s.key];
+        shadowText(promptText, W/2, H/2 - 40, 26, '#fff', 900);
+      }
+    } else if (game.state === STATE.REPLAY) {
+      drawReplay();
+      drawScoreboard();
+    } else if (game.state === STATE.FINAL) {
+      drawFinal();
+    }
+
+    ctx.restore();
+  }
+
+  // ---------- Loop ----------
+  function loop() {
+    update();
+    render();
+    requestAnimationFrame(loop);
+  }
+
+  // boot
+  restart();
+  loop();
+})();
+</script>
+</body>
+</html>
