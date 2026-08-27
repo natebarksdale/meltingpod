@@ -86,4 +86,10 @@
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
+  <url>
+    <loc>https://meltingpod.org/episode-immigration-bureaucrat.html</loc>
+    <lastmod>2026-08-13</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
 </urlset>

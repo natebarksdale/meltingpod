@@ -1,5 +1,163 @@
 [
   {
+    "number": 12,
+    "slug": "immigration-bureaucrat",
+    "title": "Confessions of an Immigration Bureaucrat, with Michael Valverde",
+    "date": "August 13, 2026",
+    "duration": "65 min",
+    "description": "Every year, U.S. Citizenship and Immigration Services (USCIS) makes millions of highly consequential decisions that affect individual people’s lives. Applications for green cards, work permits, asylum and refugee status, even U.S. citizenship – they’re all handled by the 20,000 civil servants at USCIS. The agency has always had its struggles, but under Trump 2.0, political appointees have actively undermined and targeted civil servants like never before. Michael Valverde dedicated his career to USCIS for three decades, working in roles throughout the agency and rising to senior management. Having taken early retirement after the DOGE debacle, he’s ready to pull back the curtain on how this agency really works: Why backlogs seem so endless, how immigration officers think, and what’s the difference between useful vs. useless security vetting. Michael also shares what he’s told countless new Americans at their citizenship ceremonies: Immigrants make our country richer.",
+    "megaphone_id": "PLMD6968134307",
+    "youtube": "https://youtu.be/crWzmf4wb2U",
+    "image": null,
+    "image_alt": null,
+    "summary": "<p>Every year, U.S. Citizenship and Immigration Services (USCIS) makes millions of highly consequential decisions that affect individual people’s lives. Applications for green cards, work permits, asylum and refugee status, even U.S. citizenship – they’re all handled by the 20,000 civil servants at USCIS. The agency has always had its struggles, but under Trump 2.0, political appointees have actively undermined and targeted civil servants like never before.</p><p>Michael Valverde dedicated his career to USCIS for three decades, working in roles throughout the agency and rising to senior management. Having taken early retirement after the DOGE debacle, he’s ready to pull back the curtain on how this agency really works: Why backlogs seem so endless, how immigration officers think, and what’s the difference between useful vs. useless security vetting. Michael also shares what he’s told countless new Americans at their citizenship ceremonies: Immigrants make our country richer.</p>",
+    "chapters": [
+      {"time": "0:00", "title": "Introduction"},
+      {"time": "2:47", "title": "Who is Michael Valverde?"},
+      {"time": "7:58", "title": "Six billion dollars in user fees"},
+      {"time": "11:02", "title": "Michael to immigrants: Thank you for making me richer"},
+      {"time": "13:18", "title": "Immigration in simpler days"},
+      {"time": "14:42", "title": "How is USCIS using AI?"},
+      {"time": "16:00", "title": "The journey of a green card application"},
+      {"time": "24:05", "title": "What does an immigration officer do?"},
+      {"time": "26:13", "title": "Are immigration interviews useful?"},
+      {"time": "32:20", "title": "The truth about national security screening"},
+      {"time": "37:29", "title": "The plight of Mohammed Mohammed"},
+      {"time": "40:48", "title": "The truth about social media vetting"},
+      {"time": "47:07", "title": "What is “continuous vetting”?"},
+      {"time": "50:18", "title": "Why can’t we just eliminate the backlogs?"},
+      {"time": "53:53", "title": "The targeting of civil servants under Trump 2.0"},
+      {"time": "59:38", "title": "“Working with you politicals…”"},
+      {"time": "1:03:05", "title": "Conclusion"}
+    ],
+    "guest": {
+      "name": "Michael Valverde",
+      "role": "Former Senior Official, U.S. Citizenship and Immigration Services",
+      "initials": "MV"
+    },
+    "resources": [
+      {
+        "title": "Who Pays Immigration Fees? USCIS gets most of its money from U.S citizens and companies",
+        "source": "Boundless",
+        "date": "July 2020",
+        "url": "https://web.archive.org/web/20210115154653/https://www.boundless.com/blog/who-pays-immigration-fees/",
+        "category": "learn"
+      },
+      {
+        "title": "Right-Sizing Vetting for a Secure, Fair, and Efficient Immigration System",
+        "source": "American Immigration Lawyers Association",
+        "date": "Feb. 2026",
+        "url": "https://www.aila.org/library/policy-brief-right-sizing-vetting-for-a-secure-fair-and-efficient-immigration-system",
+        "category": "learn"
+      },
+      {
+        "title": "San Bernardino attackers did not post about jihad on social media, FBI says",
+        "source": "The Guardian",
+        "date": "Dec. 2015",
+        "url": "https://www.theguardian.com/us-news/2015/dec/16/san-bernardino-attackers-jihad-social-media-fbi",
+        "category": "learn"
+      },
+      {
+        "title": "Systemic Change Needed After Faulty Times Article",
+        "source": "New York Times",
+        "date": "Dec. 2015",
+        "url": "https://archive.nytimes.com/publiceditor.blogs.nytimes.com/2015/12/18/new-york-times-san-bernardino-correction-margaret-sullivan-public-editor/",
+        "category": "learn"
+      },
+      {
+        "title": "USCIS Filing Trends: New Data Shows Immigration Processing Falling Further Behind",
+        "source": "American Immigration Council",
+        "date": "Aug. 2026",
+        "url": "https://www.americanimmigrationcouncil.org/blog/uscis-immigration-processing-trends-2026/",
+        "category": "learn"
+      },
+      {
+        "title": "Legal immigration agency employees asked to volunteer to help ICE operations",
+        "source": "CBS News",
+        "date": "March 2025",
+        "url": "https://www.cbsnews.com/news/legal-immigration-agency-employees-asked-volunteer-help-ice-operations/",
+        "category": "learn"
+      },
+      {
+        "title": "Six-hour polygraphs, forced reassignments: inside homeland security’s campaign of fear",
+        "source": "The Guardian",
+        "date": "July 2026",
+        "url": "https://www.theguardian.com/us-news/ng-interactive/2026/jul/11/inside-homeland-security-campaign-of-fear",
+        "category": "learn"
+      },
+      {
+        "title": "#AfghanEvac",
+        "description": "Working to ensure the U.S. keeps its promise to our Afghan allies",
+        "url": "https://afghanevac.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Asylum Seeker Advocacy Project",
+        "description": "The country’s largest membership organization of asylum seekers, working together for change",
+        "url": "https://asaptogether.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Black Alliance for Just Immigration (BAJI)",
+        "description": "Organizing and advocating for racial, social and economic justice",
+        "url": "https://baji.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Haitian Bridge Alliance",
+        "description": "Providing humanitarian, legal, and social services",
+        "url": "https://haitianbridgealliance.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "International Refugee Assistance Project (IRAP)",
+        "description": "Strategic litigation and advocacy to uphold the rights of people seeking safety",
+        "url": "https://refugeerights.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Justice Action Center",
+        "description": "Immigrant justice through litigation and storytelling",
+        "url": "https://justiceactioncenter.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Al Otro Lado",
+        "description": "Legal and humanitarian support to refugees, deportees, and other migrants in the U.S. and Tijuana",
+        "url": "https://www.alotrolado.org/",
+        "category": "give",
+        "scope": "local"
+      },
+      {
+        "title": "Catholic Charities Rio Grande Valley",
+        "description": "Providing assistance to the poor and most vulnerable populations in the Rio Grande Valley community",
+        "url": "https://catholiccharitiesrgv.org/",
+        "category": "give",
+        "scope": "local"
+      },
+      {
+        "title": "Las Americas Immigrant Advocacy Center",
+        "description": "Free and low-cost legal services to immigrants and refugees in West Texas, New Mexico, and Ciudad Juarez, Mexico",
+        "url": "https://www.las-americas.org/",
+        "category": "give",
+        "scope": "local"
+      },
+      {
+        "title": "Support an immigration service provider near you",
+        "url": "https://www.immigrationadvocates.org/nonprofit/legaldirectory/",
+        "category": "give",
+        "scope": "local"
+      }
+    ],
+    "transcript": null
+  },
+  {
     "number": 11,
     "slug": "three-big-lies",
     "title": "Three Big Lies About Immigrants and Fraud, with Sonya Schwartz",
