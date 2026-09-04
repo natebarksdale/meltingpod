@@ -1,5 +1,167 @@
 [
   {
+    "number": 13,
+    "slug": "asylum-not-a-loophole",
+    "title": "Asylum Is Not a Loophole, with Colleen Zengotitabengoa",
+    "date": "September 4, 2026",
+    "duration": "77 min",
+    "description": "What is asylum? Simply put, the United States must not return someone to a country where they have a well-founded fear of persecution. Following the atrocities of World War II, Congress created a U.S. asylum system under international treaty and federal law. But in recent years, as many more people sought asylum at the U.S./Mexico border, this moral and legal obligation became a political lightning rod. Colleen Zengotitabengoa has seen these challenges first-hand, in her two decades serving at the Department of Homeland Security, the White House, and Congress. As an attorney, she has directly represented asylum-seekers – real people who were not “exploiting a loophole.” Colleen will help you understand what happened to our asylum system, why it matters, and what we as a nation need to do next.",
+    "megaphone_id": "PLMD2439816445",
+    "youtube": "https://youtu.be/7FnDnGfXKfg",
+    "image": null,
+    "image_alt": null,
+    "summary": "<p>What is asylum? Simply put, the United States must not return someone to a country where they have a well-founded fear of persecution. Following the atrocities of World War II, Congress created a U.S. asylum system under international treaty and federal law. But in recent years, as many more people sought asylum at the U.S./Mexico border, this moral and legal obligation became a political lightning rod.</p><p>Colleen Zengotitabengoa has seen these challenges first-hand, in her two decades serving at the Department of Homeland Security, the White House, and Congress. As an attorney, she has directly represented asylum-seekers – real people who were not “exploiting a loophole.” Colleen will help you understand what happened to our asylum system, why it matters, and what we as a nation need to do next.</p>",
+    "chapters": [
+      {"time": "0:00", "title": "Introduction"},
+      {"time": "1:27", "title": "What is asylum?"},
+      {"time": "2:48", "title": "Who is Colleen Zengotitabengoa?"},
+      {"time": "4:21", "title": "Who qualifies for asylum?"},
+      {"time": "5:46", "title": "Comparison to the refugee process"},
+      {"time": "8:40", "title": "A brief history of asylum"},
+      {"time": "12:30", "title": "Shameful lessons of WWII"},
+      {"time": "13:32", "title": "One client’s asylum journey"},
+      {"time": "14:58", "title": "Two doors to asylum (affirmative and defensive)"},
+      {"time": "19:02", "title": "Expedited removal and credible fear"},
+      {"time": "21:32", "title": "More people claiming asylum at the border"},
+      {"time": "25:32", "title": "Asylum is not a loophole"},
+      {"time": "28:12", "title": "You can’t enforce your way out of this problem"},
+      {"time": "32:02", "title": "Then why is the border so quiet?"},
+      {"time": "33:34", "title": "What does “sealing the border” mean?"},
+      {"time": "35:39", "title": "If we can’t figure out how to fix it, then that’s on us"},
+      {"time": "38:07", "title": "Asylum doesn’t have to be this complicated"},
+      {"time": "40:42", "title": "Millions of cases in the backlog"},
+      {"time": "44:21", "title": "“Particular social group”"},
+      {"time": "46:40", "title": "Asylum and gender"},
+      {"time": "51:46", "title": "Pushing problems beyond our borders"},
+      {"time": "54:32", "title": "Why don’t we have a real refugee system in Latin America?"},
+      {"time": "57:20", "title": "Regional solutions"},
+      {"time": "1:00:19", "title": "We have a moral obligation to protect people"},
+      {"time": "1:02:22", "title": "The Supreme Court endorses “metering”"},
+      {"time": "1:07:36", "title": "Why <em>is</em> the border so quiet now?"},
+      {"time": "1:09:23", "title": "So what should we do?"},
+      {"time": "1:14:10", "title": "Three cheers for bureaucracy"},
+      {"time": "1:15:22", "title": "Conclusion (Gen X style)"}
+    ],
+    "guest": {
+      "name": "Colleen Zengotitabengoa",
+      "role": "Immigration Attorney; Former Official, Department of Homeland Security and the White House",
+      "initials": "CZ"
+    },
+    "resources": [
+      {
+        "title": "Asylum in the United States",
+        "source": "American Immigration Council",
+        "date": "June 2026",
+        "url": "https://www.americanimmigrationcouncil.org/fact-sheet/asylum-united-states/",
+        "category": "learn"
+      },
+      {
+        "title": "The Voyage of the St. Louis",
+        "source": "Facing History and Ourselves",
+        "url": "https://www.facinghistory.org/resource-library/voyage-st-louis",
+        "category": "learn"
+      },
+      {
+        "title": "Managing migration under pressure: Lessons from the Biden presidency to build a migration policy in the national interest",
+        "source": "Brookings Institution",
+        "date": "July 2025",
+        "url": "https://www.brookings.edu/articles/managing-migration-under-pressure/",
+        "category": "learn"
+      },
+      {
+        "title": "What Are Safe Mobility Offices?",
+        "source": "National Immigration Forum",
+        "date": "Feb. 2024",
+        "url": "https://forumtogether.org/article/explainer-what-are-safe-mobility-offices/",
+        "category": "learn"
+      },
+      {
+        "title": "Abandoning Principles: Unpacking the Supreme Court’s Mullin v. Al Otro Lado Denying Asylum to Arriving Migrants",
+        "source": "Just Security",
+        "date": "June 2026",
+        "url": "https://www.justsecurity.org/144499/supreme-court-otro-lado-asylum-border/",
+        "category": "learn"
+      },
+      {
+        "title": "Modernizing America’s Asylum System",
+        "source": "American Immigration Lawyers Association",
+        "date": "April 2026",
+        "url": "https://www.aila.org/library/policy-brief-modernizing-americas-asylum-system",
+        "category": "learn"
+      },
+      {
+        "title": "#AfghanEvac",
+        "description": "Working to ensure the U.S. keeps its promise to our Afghan allies",
+        "url": "https://afghanevac.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Asylum Seeker Advocacy Project",
+        "description": "The country’s largest membership organization of asylum seekers, working together for change",
+        "url": "https://asaptogether.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Black Alliance for Just Immigration (BAJI)",
+        "description": "Organizing and advocating for racial, social and economic justice",
+        "url": "https://baji.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Haitian Bridge Alliance",
+        "description": "Providing humanitarian, legal, and social services",
+        "url": "https://haitianbridgealliance.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "International Refugee Assistance Project (IRAP)",
+        "description": "Strategic litigation and advocacy to uphold the rights of people seeking safety",
+        "url": "https://refugeerights.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Justice Action Center",
+        "description": "Immigrant justice through litigation and storytelling",
+        "url": "https://justiceactioncenter.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Al Otro Lado",
+        "description": "Legal and humanitarian support to refugees, deportees, and other migrants in the U.S. and Tijuana",
+        "url": "https://www.alotrolado.org/",
+        "category": "give",
+        "scope": "local"
+      },
+      {
+        "title": "Catholic Charities Rio Grande Valley",
+        "description": "Providing assistance to the poor and most vulnerable populations in the Rio Grande Valley community",
+        "url": "https://catholiccharitiesrgv.org/",
+        "category": "give",
+        "scope": "local"
+      },
+      {
+        "title": "Las Americas Immigrant Advocacy Center",
+        "description": "Free and low-cost legal services to immigrants and refugees in West Texas, New Mexico, and Ciudad Juarez, Mexico",
+        "url": "https://www.las-americas.org/",
+        "category": "give",
+        "scope": "local"
+      },
+      {
+        "title": "Support an immigration service provider near you",
+        "url": "https://www.immigrationadvocates.org/nonprofit/legaldirectory/",
+        "category": "give",
+        "scope": "local"
+      }
+    ],
+    "transcript": null
+  },
+  {
     "number": 12,
     "slug": "immigration-bureaucrat",
     "title": "Confessions of an Immigration Bureaucrat, with Michael Valverde",
