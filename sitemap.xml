@@ -104,4 +104,10 @@
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
+  <url>
+    <loc>https://meltingpod.org/episode-suing-to-serving.html</loc>
+    <lastmod>2026-10-05</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
 </urlset>

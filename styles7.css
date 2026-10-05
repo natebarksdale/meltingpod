@@ -1958,6 +1958,26 @@ button { border: none; background: none; cursor: pointer; font-family: inherit; 
   border-radius: 6px;
 }
 
+/* ART19 embed player — the player draws its own border and rounding;
+   the wrappers just reset the navy panel and ART19's default bottom margin */
+.episode-detail__player--art19,
+.latest__player--art19 {
+  display: block;
+  padding: 0;
+  background: none;
+}
+
+.episode-detail__player--art19 .art19-web-player,
+.latest__player--art19 .art19-web-player {
+  width: 100%;
+  margin: 0;
+}
+
+.episode-detail__player--art19 .art19-web-player .awp-container,
+.latest__player--art19 .art19-web-player .awp-container {
+  border-radius: 10px;
+}
+
 .episode-detail__desc {
   font-size: 1.05rem;
   color: var(--slate);

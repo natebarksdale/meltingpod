@@ -27,7 +27,19 @@ TRAILER_MEGAPHONE_ID = "PLMD2689917559"
 APPLE_PODCASTS_URL = "https://podcasts.apple.com/us/podcast/the-melting-pod/id1879323085"
 SPOTIFY_URL = "https://open.spotify.com/show/4QEIjShsqmjMvvLsmdU2Yb"
 YOUTUBE_URL = "https://www.youtube.com/@themeltingpod"
-RSS_FEED_URL = "https://feeds.megaphone.fm/PLMD2833058809"
+RSS_FEED_URL = "https://rss.art19.com/the-melting-pod"
+
+
+
+def art19_player(episode_id, *, element_id=""):
+    """ART19 web player embed. The player script replaces the div with its UI;
+    chapter seeking is wired up in main7.js via the #art19Player id."""
+    id_attr = f' id="{element_id}"' if element_id else ""
+    return (
+        '<link rel="stylesheet" href="https://web-player.art19.com/assets/current.css">\n'
+        f'            <div{id_attr} class="art19-web-player awp-medium awp-theme-dark-blue" data-episode-id="{episode_id}"></div>\n'
+        '            <script src="https://web-player.art19.com/assets/current.js" async></script>'
+    )
 
 # Newsletter subscriptions are handled by a Netlify serverless function
 # that calls the Beehiiv API. See netlify/functions/subscribe.js.
@@ -402,7 +414,11 @@ def build_index(episodes):
     recent = newest_first[1:4]  # Next most recent episodes
 
     # Player embed
-    if latest.get("megaphone_id"):
+    if latest.get("art19_id"):
+        player_html = f'''          <div class="latest__player latest__player--art19">
+            {art19_player(latest['art19_id'])}
+          </div>'''
+    elif latest.get("megaphone_id"):
         player_html = f'''          <div class="latest__player latest__player--megaphone">
             <iframe frameborder="0" height="200" scrolling="no" src="https://playlist.megaphone.fm?e={latest['megaphone_id']}" width="100%" title="Listen: {latest['title']}" loading="lazy"></iframe>
           </div>'''
@@ -740,8 +756,12 @@ def build_episode_bottom_nav(prev_ep, next_ep):
 
 def build_episode_detail(ep, prev_ep=None, next_ep=None):
     """Build an individual episode detail page."""
-    # Player (single-episode embed supports ?start= for chapter seeking)
-    if ep.get("megaphone_id"):
+    # Player (Megaphone single-episode embed supports ?start= for chapter seeking)
+    if ep.get("art19_id"):
+        player_html = f'''          <div class="episode-detail__player episode-detail__player--art19">
+            {art19_player(ep['art19_id'], element_id="art19Player")}
+          </div>'''
+    elif ep.get("megaphone_id"):
         player_html = f'''          <div class="episode-detail__player episode-detail__player--megaphone">
             <iframe id="megaphonePlayer" frameborder="0" height="200" scrolling="no" src="https://player.megaphone.fm/{ep['megaphone_id']}" width="100%" title="Listen: {ep['title']}" loading="lazy"></iframe>
           </div>'''
@@ -971,7 +991,12 @@ def build_episode_detail(ep, prev_ep=None, next_ep=None):
             "url": f"{SITE_URL}/",
         },
     }
-    if ep.get("megaphone_id"):
+    if ep.get("art19_id"):
+        ep_jsonld["associatedMedia"] = {
+            "@type": "MediaObject",
+            "contentUrl": f"https://rss.art19.com/episodes/{ep['art19_id']}.mp3",
+        }
+    elif ep.get("megaphone_id"):
         ep_jsonld["associatedMedia"] = {
             "@type": "MediaObject",
             "contentUrl": f"https://player.megaphone.fm/{ep['megaphone_id']}",

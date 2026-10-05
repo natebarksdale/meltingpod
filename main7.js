@@ -318,6 +318,83 @@
     });
   }
 
+  // --- Chapter timestamp seeking (ART19 player) ---
+  // The ART19 web player exposes no page-level API, so we seek by sending a
+  // click to its progress slider at the right fraction of the duration.
+  // The slider ignores input until audio has loaded and any pre-roll ads finish.
+  const art19Player = document.getElementById('art19Player');
+  if (art19Player) {
+    const toSeconds = t => t.split(':').reduce((acc, n) => acc * 60 + Number(n), 0);
+
+    function clickSlider(seconds) {
+      const bar = art19Player.querySelector('.awp-progress');
+      const timeMatch = art19Player.innerText.match(/\d+:\d+(?::\d+)?\s*\/\s*(\d+:\d+(?::\d+)?)/);
+      if (!bar || !timeMatch) return;
+      const duration = toSeconds(timeMatch[1]);
+      if (!duration) return;
+      const rect = bar.getBoundingClientRect();
+      const x = rect.left + rect.width * Math.min(seconds / duration, 1);
+      const y = rect.top + rect.height / 2;
+      const opts = { bubbles: true, cancelable: true, view: window, clientX: x, clientY: y, button: 0, buttons: 1 };
+      bar.dispatchEvent(new MouseEvent('mousedown', opts));
+      bar.dispatchEvent(new MouseEvent('mouseup', opts));
+    }
+
+    let pendingSeek = null;
+    let polling = false;
+
+    function seekTo(seconds) {
+      const container = art19Player.querySelector('.awp-container');
+      const toggle = art19Player.querySelector('[data-action="playback-toggle"]');
+      if (!container || !toggle) return;
+      art19Player.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      const cls = container.classList;
+      const loaded = () => cls.contains('awp-playing') || cls.contains('awp-paused');
+      const canSeek = () => loaded() && !cls.contains('awp-ad-playing');
+
+      if (canSeek()) {
+        clickSlider(seconds);
+        if (cls.contains('awp-paused')) toggle.click();
+        return;
+      }
+
+      // Audio not loaded yet, or a pre-roll ad is playing: start playback if
+      // needed and seek as soon as the episode itself is playing
+      pendingSeek = seconds;
+      if (!loaded() && !cls.contains('awp-loading')) toggle.click();
+      if (polling) return;
+      polling = true;
+      const started = Date.now();
+      (function waitForEpisode() {
+        if (canSeek()) {
+          clickSlider(pendingSeek);
+          pendingSeek = null;
+          polling = false;
+        } else if (Date.now() - started < 5 * 60 * 1000) {
+          setTimeout(waitForEpisode, 250);
+        } else {
+          pendingSeek = null;
+          polling = false;
+        }
+      })();
+    }
+
+    document.querySelectorAll('.chapters__time[data-seconds]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        seekTo(parseInt(btn.dataset.seconds, 10));
+      });
+    });
+
+    document.querySelectorAll('.chapters__item').forEach(item => {
+      item.addEventListener('click', () => {
+        const btn = item.querySelector('.chapters__time[data-seconds]');
+        if (btn) seekTo(parseInt(btn.dataset.seconds, 10));
+      });
+    });
+  }
+
   // --- Chapters expand/collapse ---
   var chaptersToggle = document.getElementById('chaptersToggle');
   var chaptersSection = document.getElementById('chaptersSection');
