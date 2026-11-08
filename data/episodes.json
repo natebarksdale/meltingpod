@@ -1,4 +1,204 @@
 [
+    {
+    "number": 17,
+    "slug": "midterm-special-counting-wins-drinking-tears-and-going-big",
+    "title": "Midterm Special: Counting Wins, Drinking Tears, and Going Big",
+    "date": "November 7, 2026",
+    "duration": "49 min",
+    "description": "Amanda, Claire, and Doug break down the 2026 midterm news for you: Who were the most inspiring winners? The most deserving losers? What were the best memes? The worst takes? How should Democrats use their stunning new majorities in the House and Senate to deliver the change voters demanded, on immigration and affordability, when Trump wields the veto pen? There will be arguments! And, live on tape, a very unwelcome surprise!",
+    "art19_id": "1c7b043c-74da-486a-82b4-4dfecf75005a",
+    "youtube": "https://youtu.be/YYnJlnV1d18",
+    "image": null,
+    "image_alt": null,
+    "summary": "<p>Amanda, Claire, and Doug break down the 2026 midterm news for you:</p><p>Who were the most inspiring winners? The most deserving losers?</p><p>What were the best memes? The worst takes?</p><p>How should Democrats use their stunning new majorities in the House and Senate to deliver the change voters demanded, on immigration and affordability, when Trump wields the veto pen?</p><p>There will be arguments! And, live on tape, a very unwelcome surprise!</p>",
+    "chapters": null,
+    "guest": null,
+    "resources": [
+      {
+        "title": "Bernie Sanders: “Trump is a funny guy”",
+        "source": null,
+        "date": null,
+        "url": "https://www.facebook.com/reel/1673191347523164",
+        "category": "learn"
+      },
+      {
+        "title": "The Voters Who Flipped Congress",
+        "source": "The Daily",
+        "date": "November 5, 2026",
+        "url": "https://www.nytimes.com/2026/11/05/podcasts/the-daily/midterms-voters-who-flipped-congress.html",
+        "category": "learn"
+      },
+      {
+        "title": "Tiger Beat cover with Ossoff, Talarico, and El-Sayed",
+        "source": null,
+        "date": null,
+        "url": "https://bsky.app/profile/mollyknight.bsky.social/post/3mz6tqworqs2c",
+        "category": "learn"
+      },
+      {
+        "title": "Frodo awakens after election night",
+        "source": null,
+        "date": null,
+        "url": "https://www.instagram.com/reels/DfVOMsLpxEl/",
+        "category": "learn"
+      },
+      {
+        "title": "Pick another protein",
+        "source": null,
+        "date": null,
+        "url": "https://www.youtube.com/shorts/Tv7cPgYIb1w",
+        "category": "learn"
+      },
+      {
+        "title": "Sinners parody",
+        "source": null,
+        "date": null,
+        "url": "https://thehill.com/homenews/campaign/6186475-scott-colom-releases-sinners-themed-campaign-ad-as-mississippi-senate-race-heats-up/",
+        "category": "learn"
+      },
+      {
+        "title": "The multi-faith family behind America’s first Muslim senator-elect, Abdul El-Sayed",
+        "source": "Economic Times",
+        "date": "November 2026",
+        "url": "https://economictimes.indiatimes.com/news/international/us/grandson-of-a-vegetable-seller-in-egypt-raised-by-an-imam-father-and-a-michigan-born-stepmother-the-multi-faith-family-behind-americas-first-muslim-senator-elect-abdul-el-sayed/articleshow/135542396.cms",
+        "category": "learn"
+      },
+      {
+        "title": "Xavier Becerra on Why His Upbringing and Career Give Him an Edge Over Other Gubernatorial Candidates",
+        "source": "KQED",
+        "date": "February 2026",
+        "url": "https://www.kqed.org/news/12074132/xavier-becerra-on-why-his-upbringing-and-career-give-him-an-edge-over-other-gubernatorial-candidates",
+        "category": "learn"
+      },
+      {
+        "title": "Melat Kiros becomes the first Gen Z woman elected to Congress",
+        "source": "NPR",
+        "date": "November 2026",
+        "url": "https://www.npr.org/2026/11/03/g-s1-150229/melat-kiros-first-gen-z-woman-elected-to-congress",
+        "category": "learn"
+      },
+      {
+        "title": "Amish Shah Becomes First Indian American Elected to Congress From Arizona",
+        "source": "India New England News",
+        "date": "November 2026",
+        "url": "https://indianewengland.com/amish-shah-becomes-first-indian-american-elected-to-congress-from-arizona/",
+        "category": "learn"
+      },
+      {
+        "title": "A well-known Sacramento Democrat [Dr. Richard Pan] is taking on this suddenly vulnerable California Republican",
+        "source": "CalMatters",
+        "date": "October 2025",
+        "url": "https://calmatters.org/politics/2025/10/richard-pan-3rd-congressional-district/",
+        "category": "learn"
+      },
+      {
+        "title": "Mixed Immigration Status Gave Brothers [Randy and Angel Villegas] ‘Very Different Perspectives’",
+        "source": "StoryCorps, NPR",
+        "date": "April 2021",
+        "url": "https://www.npr.org/transcripts/989791767",
+        "category": "learn"
+      },
+      {
+        "title": "Pia Dandiya, the Harvard-Educated Daughter of Indian Immigrants, Headed to U.S. Congress",
+        "source": "American Kahani",
+        "date": "November 4, 2026",
+        "url": "https://americankahani.com/lead-stories/pia-dandiya-the-harvard-educated-daughter-of-indian-immigrants-headed-to-u-s-congress/",
+        "category": "learn"
+      },
+      {
+        "title": "Darializa Avila Chevalier: pro-Palestinian doctoral student steps into politics with ‘faith in the future’",
+        "source": "The Guardian",
+        "date": "June 2026",
+        "url": "https://www.theguardian.com/us-news/2026/jun/24/darializa-avila-chevalier-win-new-york",
+        "category": "learn"
+      },
+      {
+        "title": "Who is Adam Hamawy, the Gaza volunteer surgeon heading to Congress?",
+        "source": "Arab News",
+        "date": "November 2026",
+        "url": "https://www.arabnews.com/world/who-is-adam-hamawy-the-gaza-volunteer-surgeon-heading-to-congress-3009746",
+        "category": "learn"
+      },
+      {
+        "title": "Midterm Election Results in 5 States Provide Way for National Popular Vote to Reach 270 During 2027",
+        "source": null,
+        "date": null,
+        "url": "https://www.nationalpopularvote.com/midterm-election-results-5-states-provide-way-national-popular-vote-reach-270-during-2027",
+        "category": "learn"
+      },
+      {
+        "title": "#AfghanEvac",
+        "description": "Working to ensure the U.S. keeps its promise to our Afghan allies",
+        "url": "https://afghanevac.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Asylum Seeker Advocacy Project",
+        "description": "The country’s largest membership organization of asylum seekers, working together for change",
+        "url": "https://asaptogether.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Black Alliance for Just Immigration (BAJI)",
+        "description": "Organizing and advocating for racial, social and economic justice",
+        "url": "https://baji.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Haitian Bridge Alliance",
+        "description": "Providing humanitarian, legal, and social services",
+        "url": "https://haitianbridgealliance.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "International Refugee Assistance Project (IRAP)",
+        "description": "Strategic litigation and advocacy to uphold the rights of people seeking safety",
+        "url": "https://refugeerights.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Justice Action Center",
+        "description": "Immigrant justice through litigation and storytelling",
+        "url": "https://justiceactioncenter.org/",
+        "category": "give",
+        "scope": "national"
+      },
+      {
+        "title": "Al Otro Lado",
+        "description": "Legal and humanitarian support to refugees, deportees, and other migrants in the U.S. and Tijuana",
+        "url": "https://www.alotrolado.org",
+        "category": "give",
+        "scope": "local"
+      },
+      {
+        "title": "Catholic Charities Rio Grande Valley",
+        "description": "Providing assistance to the poor and most vulnerable populations in the Rio Grande Valley community",
+        "url": "https://catholiccharitiesrgv.org/",
+        "category": "give",
+        "scope": "local"
+      },
+      {
+        "title": "Las Americas Immigrant Advocacy Center",
+        "description": "Free and low-cost legal services to immigrants and refugees in West Texas, New Mexico, and Ciudad Juarez, Mexico",
+        "url": "https://www.las-americas.org/",
+        "category": "give",
+        "scope": "local"
+      },
+      {
+        "title": "Support an immigration service provider near you",
+        "description": null,
+        "url": "https://www.immigrationadvocates.org/nonprofit/legaldirectory/",
+        "category": "give",
+        "scope": "local"
+      }
+    ],
+    "transcript": null
+  },
   {
     "number": 16,
     "slug": "the-diplomat",
