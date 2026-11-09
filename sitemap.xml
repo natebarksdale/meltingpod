@@ -116,4 +116,10 @@
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
+  <url>
+    <loc>https://meltingpod.org/episode-midterm-special-counting-wins-drinking-tears-and-going-big.html</loc>
+    <lastmod>2026-11-07</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
 </urlset>
